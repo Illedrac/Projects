@@ -5,6 +5,9 @@
 #include <unordered_set>
 #include <vector>
 #include <chrono>
+#include <future>
+
+#define SCREEN_WIDTH_HEIGHT 500
 
 void bubbleSort(std::vector<int>& vector);
 
@@ -20,25 +23,33 @@ public:
 
     bool OnUserCreate() override
     {
-        maxNumberValue = ScreenHeight();
-        maxNumbers = ScreenWidth();
-        unsortedNumbersVec.resize(0);
+        maxNumberValue = SCREEN_WIDTH_HEIGHT;
+        maxNumbers = SCREEN_WIDTH_HEIGHT;
 
+        createUnsortedArray();
+
+        DrawArray();
+
+        return true;
+    }
+
+    void createUnsortedArray() {
         std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
         std::uniform_int_distribution<> distrib(1, maxNumberValue);
-    
+
+        unsortedNumbers.clear();
+        unsortedNumbersArrSize = (sizeof(unsortedNumbersArr) / sizeof(int));
+
+        int index = 0;
         while (unsortedNumbers.size() < maxNumbers) {
             int curNum = distrib(gen);
 
             if (unsortedNumbers.find(curNum) == unsortedNumbers.end()) {
                 unsortedNumbers.insert(curNum);
-                unsortedNumbersVec.push_back(curNum);
+                unsortedNumbersArr[index] = curNum;
+                index++;
             }
         }
-
-        //std::sort(unsortedNumbersVec.begin(), unsortedNumbersVec.end());
-
-        return true;
     }
 
     bool OnUserUpdate(float fElapsedTime) override
@@ -46,44 +57,76 @@ public:
         if (GetKey(olc::Key::ESCAPE).bPressed)
             return false;
 
-        DrawVector();
-        
-        if (GetKey(olc::Key::SPACE).bPressed) {
-            bubbleSort();
-        }
-        //DrawVector();
+        bubbleSort();
+
+            
+        //}
+        //DrawArray();
 
         return true;
     }
 
     void bubbleSort() {
-        for (int i = 0; i < unsortedNumbersVec.size(); i++) {
-            for (int j = i + 1; j < unsortedNumbersVec.size(); j++)
+        if (curI < unsortedNumbersArrSize) {
+            if (curJ < unsortedNumbersArrSize) {
+                bubbleSort(curI, curJ);
+                curJ++;
+            }
+            else if (curJ >= unsortedNumbersArrSize) {
+                curI++;
+                curJ = curI + 1;
+                bubbleSort(curI, curJ);
+            }
+        }
+    }
+
+    void bubbleSort(int i, int j) {
+
+        if (i < unsortedNumbersArrSize) {
+
+            if (unsortedNumbersArr[j] < unsortedNumbersArr[i]) {
+                int temp = unsortedNumbersArr[i];
+                unsortedNumbersArr[i] = unsortedNumbersArr[j];
+                unsortedNumbersArr[j] = temp;
+
+                DrawArray(i);
+                DrawArray(j);
+            }
+        }
+        /*
+        for (int i = 0; i < ( sizeof(unsortedNumbersArr) / sizeof(int) ); i++) {
+            for (int j = i + 1; j < ( sizeof(unsortedNumbersArr) / sizeof(int) ); j++)
             {
-                if (unsortedNumbersVec.at(j) < unsortedNumbersVec.at(i)) {
-                    int temp = unsortedNumbersVec.at(i);
-                    unsortedNumbersVec.at(i) = unsortedNumbersVec.at(j);
-                    unsortedNumbersVec.at(j) = temp;
+                if (unsortedNumbersArr[j] < unsortedNumbersArr[i]) {
+                    int temp = unsortedNumbersArr[i];
+                    unsortedNumbersArr[i] = unsortedNumbersArr[j];
+                    unsortedNumbersArr[j] = temp;
+                    DrawArray(i, olc::CYAN);
                 }
                 //std::this_thread::sleep_for(std::chrono::milliseconds{ 2 });
             }
         }
+        */
     }
 
-    void DrawVector() {
-        for (int x = 0; x < ScreenWidth(); x++) {
-            for (int y = ScreenWidth() - 1; y >= 0; y--) {
-                if (y > (maxNumberValue - unsortedNumbersVec.at(x)))
-                    Draw(x, y, olc::Pixel(255, 255, 255));
-                else
-                    Draw(x, y, olc::Pixel(0,0,0));
-                        
-                //std::cout << "X: " << x << " Y: " << y << " UNSORT: " << unsortedNumbersVec.at(x) << " UNSORT - MAX: " << maxNumberValue - unsortedNumbersVec.at(x) << std::endl;
-            }
+    void DrawArray(int x) {
+        DrawLine(x, SCREEN_WIDTH_HEIGHT, x, maxNumberValue - unsortedNumbersArr[x]);
+        DrawLine(x, maxNumberValue - unsortedNumbersArr[x], x, 0, olc::BLACK);
+    }
+
+    void DrawArray(int x, olc::Pixel color) {
+        DrawLine(x, SCREEN_WIDTH_HEIGHT, x, maxNumberValue - unsortedNumbersArr[x], color);
+        DrawLine(x, maxNumberValue - unsortedNumbersArr[x], x, 0, olc::BLACK);
+    }
+    
+    void DrawArray() {
+        FillRect(0, 0, ScreenHeight(), ScreenWidth(), olc::BLACK);
+        for (int x = 0; x < SCREEN_WIDTH_HEIGHT; x++) {
+            DrawLine(x, SCREEN_WIDTH_HEIGHT, x, maxNumberValue - unsortedNumbersArr[x] );
         }
     }
+    
 
-private:
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen; // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib;
@@ -91,8 +134,11 @@ private:
     std::unordered_set<int> unsortedNumbers;
     int maxNumberValue;
     int maxNumbers;
-    std::vector<int> unsortedNumbersVec;
+    int unsortedNumbersArr[SCREEN_WIDTH_HEIGHT];
+    int unsortedNumbersArrSize;
     bool shouldUpdate = true;
+    int curI = 0;
+    int curJ = 0;
 };
 
 
@@ -102,10 +148,13 @@ private:
 int main() {
 
     SortingAlgorithms sA;
-    sA.Construct(1000, 1000, 1, 1);
+    sA.Construct(SCREEN_WIDTH_HEIGHT,SCREEN_WIDTH_HEIGHT, 2, 2);
     sA.Start();
 
-    
+    int i = 0, j = 0;
+
+    //std::future<void> fut = std::async(std::launch::async, [&] { sA.DrawArray(i, sA.unsortedNumbersArr[j)); }, i, sA.unsortedNumbersArr[j));
+
 
     return 0;
 }
