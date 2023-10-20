@@ -4,6 +4,9 @@
 #include <random>
 #include <unordered_set>
 #include <vector>
+#include <chrono>
+
+void bubbleSort(std::vector<int>& vector);
 
 // Override base class with your custom functionality
 class SortingAlgorithms : public olc::PixelGameEngine
@@ -17,11 +20,12 @@ public:
 
     bool OnUserCreate() override
     {
-        maxNumbers = ScreenHeight();
+        maxNumberValue = ScreenHeight();
+        maxNumbers = ScreenWidth();
         unsortedNumbersVec.resize(0);
 
         std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
-        std::uniform_int_distribution<> distrib(1, maxNumbers);
+        std::uniform_int_distribution<> distrib(1, maxNumberValue);
     
         while (unsortedNumbers.size() < maxNumbers) {
             int curNum = distrib(gen);
@@ -32,24 +36,8 @@ public:
             }
         }
 
-        std::sort(unsortedNumbersVec.begin(), unsortedNumbersVec.end());
+        //std::sort(unsortedNumbersVec.begin(), unsortedNumbersVec.end());
 
-        for (int i = 0; i < unsortedNumbersVec.size(); i++) {
-            std::cout << unsortedNumbersVec.at(i) << " ";
-        }
-
-        std::cout << "END";
-
-        // for each x ->
-        // loop from ScreenHeight() -> current unsortedNumbers value
-        // draw(x,y, white)
-
-        for (int x = 0; x < ScreenWidth(); x++) {
-            for (int y = 0; y < unsortedNumbersVec.at(x%(maxNumbers-1)) ; y++) {
-                Draw(x, y, olc::Pixel(255, 255, 255));
-                //std::cout << "X: " << x << " Y: " << y << " UNSORT: " << unsortedNumbersVec.at(x) << " UNSORT - MAX: " << maxNumbers - unsortedNumbersVec.at(x) << std::endl;
-            }
-        }
         return true;
     }
 
@@ -57,8 +45,42 @@ public:
     {
         if (GetKey(olc::Key::ESCAPE).bPressed)
             return false;
+
+        DrawVector();
         
+        if (GetKey(olc::Key::SPACE).bPressed) {
+            bubbleSort();
+        }
+        //DrawVector();
+
         return true;
+    }
+
+    void bubbleSort() {
+        for (int i = 0; i < unsortedNumbersVec.size(); i++) {
+            for (int j = i + 1; j < unsortedNumbersVec.size(); j++)
+            {
+                if (unsortedNumbersVec.at(j) < unsortedNumbersVec.at(i)) {
+                    int temp = unsortedNumbersVec.at(i);
+                    unsortedNumbersVec.at(i) = unsortedNumbersVec.at(j);
+                    unsortedNumbersVec.at(j) = temp;
+                }
+                //std::this_thread::sleep_for(std::chrono::milliseconds{ 2 });
+            }
+        }
+    }
+
+    void DrawVector() {
+        for (int x = 0; x < ScreenWidth(); x++) {
+            for (int y = ScreenWidth() - 1; y >= 0; y--) {
+                if (y > (maxNumberValue - unsortedNumbersVec.at(x)))
+                    Draw(x, y, olc::Pixel(255, 255, 255));
+                else
+                    Draw(x, y, olc::Pixel(0,0,0));
+                        
+                //std::cout << "X: " << x << " Y: " << y << " UNSORT: " << unsortedNumbersVec.at(x) << " UNSORT - MAX: " << maxNumberValue - unsortedNumbersVec.at(x) << std::endl;
+            }
+        }
     }
 
 private:
@@ -67,16 +89,20 @@ private:
     std::uniform_int_distribution<> distrib;
 
     std::unordered_set<int> unsortedNumbers;
+    int maxNumberValue;
     int maxNumbers;
     std::vector<int> unsortedNumbersVec;
+    bool shouldUpdate = true;
 };
+
+
 
 
 
 int main() {
 
     SortingAlgorithms sA;
-    sA.Construct(1920, 1080, 4, 4,true);
+    sA.Construct(1000, 1000, 1, 1);
     sA.Start();
 
     
