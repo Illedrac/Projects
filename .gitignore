@@ -400,3 +400,4 @@ FodyWeavers.xsd
 #Additional Files
 *.vcxproj
 *.vcxproj.filters
+*.sln
