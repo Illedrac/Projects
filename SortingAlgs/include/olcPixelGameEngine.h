@@ -207,7 +207,8 @@
 	2.02: Added Decal destructor, optimised Pixel constructor
 	2.03: Added FreeBSD flags, Added DrawStringDecal()
 	2.04: Windows Full-Screen bug fixed
-	2.05: +DrawPartialWarpedDecal() - draws a warped decal from a subset image
+	2.05: +DrawPartialWarpedDe
+cal() - draws a warped decal from a subset image
 		  +DrawPartialRotatedDecal() - draws a rotated decal from a subset image
 	2.06: +GetTextSize() - returns area occupied by multiline string
 		  +GetWindowSize() - returns actual window size
