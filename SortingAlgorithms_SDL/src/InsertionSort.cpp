@@ -35,7 +35,7 @@ bool InsertionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
             unsortedNumbersArray->at(j + 1) = key;
         }
     }
-    isSorted = false;
+    isSorted = true;
     return true;
 }
 

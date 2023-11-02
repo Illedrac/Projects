@@ -45,7 +45,8 @@ int WinMain() {
     Uint32 frame_start;
     int frame_time;
 
-    AlgorithmType algorithm_type = AlgorithmType::SELECTION_SORT;
+    AlgorithmType algorithm_type = AlgorithmType::BINARY_INSERTION_SORT;
+
     SortingAlgorithmsMain* sAM = new SortingAlgorithmsMain(width, width);
     sAM->Initialize(algorithm_type, width);
 
@@ -78,7 +79,6 @@ int WinMain() {
                         else {
                             SDL_SetWindowFullscreen(sAM->window, 0);
                         }
-                        display_initial_array = true;
                         break;
                     }
                     else if (event.key.keysym.scancode == SDL_SCANCODE_R) {
@@ -93,6 +93,11 @@ int WinMain() {
                 default: 
                     break;
             }
+        }
+
+        if (sAM->sorting_algorithm_implementation->isSorted) {
+            //sAM->Initialize(AlgorithmType::INSERTION_SORT, width);
+            //display_initial_array = true;
         }
 
         frame_time = SDL_GetTicks() - frame_start;

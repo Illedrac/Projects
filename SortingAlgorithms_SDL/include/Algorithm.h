@@ -5,7 +5,9 @@
 
 enum AlgorithmType {
     INSERTION_SORT,
+    BINARY_INSERTION_SORT,
     SELECTION_SORT
+    
 };
 
 class Algorithm {
@@ -36,6 +38,7 @@ public:
 
     void DrawCurrentArray(SDL_Window* window, SDL_Renderer* renderer, int screen_width) {
         for (int i = 0; i < unsortedNumbersArray->size(); i++) {
+            ClearCurrentArrayAtIndex(window, renderer, i, screen_width);
             DrawCurrentArrayAtIndex(window, renderer, i, screen_width);
         }
         SDL_RenderPresent(renderer);

@@ -40,4 +40,6 @@ bool SelectionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
 
         SDL_Delay(10);
     }
+
+    isSorted = true;
 }
