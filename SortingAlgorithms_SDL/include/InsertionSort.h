@@ -3,11 +3,10 @@
 
 class InsertionSort : public Algorithm {
 public:
-	InsertionSort(int width);
+	InsertionSort(int screen_width, int unsorted_array_size);
 
-	void SortArray(SDL_Window* window, SDL_Renderer* renderer);
-	void DrawCurrentArray(SDL_Window* window, SDL_Renderer* renderer);
-	void DrawCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX);
-	void ClearCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX);
-
+	bool SortArray(SDL_Window* window, SDL_Renderer* renderer);
+	
+private:
+	int screen_width;
 };

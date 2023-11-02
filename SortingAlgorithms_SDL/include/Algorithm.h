@@ -10,12 +10,58 @@ enum AlgorithmType {
 
 class Algorithm {
 public:
-    virtual void SortArray(SDL_Window* window, SDL_Renderer* renderer) = 0;
-    virtual void DrawCurrentArray(SDL_Window* window, SDL_Renderer* renderer) = 0;
-    virtual void DrawCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX) = 0;
-    virtual void ClearCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX) = 0;
+    virtual bool SortArray(SDL_Window* window, SDL_Renderer* renderer) = 0;
+    
+    bool CheckSDLEvents() {
+        SDL_Event event;
 
-    inline void CreateUnsortedArray(int SCREEN_WIDTH_HEIGHT) {
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_WINDOWEVENT_MOVED:
+                break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                    return false;
+                break;
+            case SDL_QUIT:
+                return false;
+                break;
+
+            default:
+                break;
+            }
+        }
+        return true;
+    }
+
+    void DrawCurrentArray(SDL_Window* window, SDL_Renderer* renderer, int screen_width) {
+        for (int i = 0; i < unsortedNumbersArray->size(); i++) {
+            DrawCurrentArrayAtIndex(window, renderer, i, screen_width);
+        }
+        SDL_RenderPresent(renderer);
+    }
+
+    void DrawCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX, int screen_width) {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_Rect rect;
+        rect.x = posX * (screen_width / unsortedNumbersArray->size());
+        rect.y = screen_width - (unsortedNumbersArray->at(posX) * (screen_width / unsortedNumbersArray->size()));
+        rect.w = screen_width / unsortedNumbersArray->size();
+        rect.h = unsortedNumbersArray->at(posX) * (screen_width / unsortedNumbersArray->size());
+        SDL_RenderFillRect(renderer, &rect);
+    }
+
+    void ClearCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX, int screen_width) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_Rect rect;
+        rect.x = posX * (screen_width / unsortedNumbersArray->size());
+        rect.y = 0;
+        rect.w = screen_width / unsortedNumbersArray->size();
+        rect.h = screen_width;
+        SDL_RenderFillRect(renderer, &rect);
+    }
+
+    void CreateUnsortedArray(int SCREEN_WIDTH_HEIGHT) {
         
         std::random_device rd;  // a seed source for the random number engine
         std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
@@ -38,7 +84,7 @@ public:
         }
     }
 
-    inline void GenerateRGB(int SCREEN_WIDTH_HEIGHT) {
+    void GenerateRGB(int SCREEN_WIDTH_HEIGHT) {
         int r = 255;
         int g = 5;
         int b = 5;

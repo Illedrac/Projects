@@ -3,5 +3,5 @@
 
 class AlgorithmFactory{
 public:
-    static Algorithm* CreateAlgorithm(AlgorithmType type, int width);
+    static Algorithm* CreateAlgorithm(AlgorithmType type, int screen_width, int unsorted_array_size);
 };
