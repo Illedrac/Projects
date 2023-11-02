@@ -45,8 +45,9 @@ int WinMain() {
     Uint32 frame_start;
     int frame_time;
 
+    AlgorithmType algorithm_type = AlgorithmType::SELECTION_SORT;
     SortingAlgorithmsMain* sAM = new SortingAlgorithmsMain(width, width);
-    sAM->Initialize(AlgorithmType::INSERTION_SORT, width);
+    sAM->Initialize(algorithm_type, width);
 
     SDL_Event event;
     bool continue_running_program = SDL_TRUE;

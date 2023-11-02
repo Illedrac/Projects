@@ -5,7 +5,7 @@
 
 enum AlgorithmType {
     INSERTION_SORT,
-    BUBBLE_SORT
+    SELECTION_SORT
 };
 
 class Algorithm {
