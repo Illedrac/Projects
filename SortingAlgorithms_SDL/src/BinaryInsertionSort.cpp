@@ -64,5 +64,6 @@ bool BinaryInsertionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer)
         DrawCurrentArrayAtIndex(window, renderer, j + 1, screen_width);
         SDL_RenderPresent(renderer);
     }
+    isSorted = true;
     return true;
 }

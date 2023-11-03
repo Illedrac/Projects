@@ -33,6 +33,10 @@ bool InsertionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
 
             }
             unsortedNumbersArray->at(j + 1) = key;
+
+            ClearCurrentArrayAtIndex(window, renderer, j + 1, screen_width);
+            DrawCurrentArrayAtIndex(window, renderer, j + 1, screen_width);
+            SDL_RenderPresent(renderer);
         }
     }
     isSorted = true;
