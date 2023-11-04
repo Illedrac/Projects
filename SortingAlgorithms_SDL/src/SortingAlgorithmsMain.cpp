@@ -16,7 +16,7 @@ SortingAlgorithmsMain::SortingAlgorithmsMain(int screen_width, int height) :
     SDL_CreateWindowAndRenderer(screen_width, height, 0, &window, &renderer);
 }
 
-// A function that returs a string to the full path of a given font name
+// A function that returns a string to the full path of a given font name
 // Based on the SDL_GetBasePath() and uses a resource folder I created to store resources
 std::string SortingAlgorithmsMain::GetFontPath(const std::string& font_name){
     std::string path_to_font = SDL_GetBasePath();
