@@ -1,5 +1,6 @@
 #include "TextBox.h"
 
+// A class to store relevant information to render text to the screen, acts as a "button"
 TextBox::TextBox(SDL_Renderer* renderer, const std::string& font_path, int font_size, int w, int h, const std::string message_text)
 {
     if (TTF_Init() == -1) {

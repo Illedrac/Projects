@@ -8,7 +8,6 @@
 class SortingAlgorithmsMain {
 
 public:
-	SortingAlgorithmsMain(SDL_Window* window, SDL_Renderer* renderer);
 	SortingAlgorithmsMain(int width, int height);
 
 	std::string GetFontPath(const std::string& font_name);
