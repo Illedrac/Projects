@@ -43,6 +43,27 @@ public:
         return true;
     }
 
+
+    // A function to draw the entire array  
+    void DrawInitialArray(SDL_Window* window, SDL_Renderer* renderer, int screen_width) {
+        for (int i = 0; i < unsortedNumbersArray->size(); i++) {
+            ClearCurrentArrayAtIndex(window, renderer, i, screen_width);
+            DrawCurrentArrayAtIndex(window, renderer, i, screen_width);
+        }
+        SDL_RenderPresent(renderer);
+    }
+
+    // A function to draw a rectangle to screen at a given x position and color
+    void DrawCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX, int screen_width) {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_Rect rect;
+        rect.x = posX * (screen_width / unsortedNumbersArray->size());
+        rect.y = screen_width - (unsortedNumbersArray->at(posX) * (screen_width / unsortedNumbersArray->size()));
+        rect.w = screen_width / unsortedNumbersArray->size();
+        rect.h = unsortedNumbersArray->at(posX) * (screen_width / unsortedNumbersArray->size());
+        SDL_RenderFillRect(renderer, &rect);
+    }
+    
     // A function to draw the entire array  
     void DrawCurrentArray(SDL_Window* window, SDL_Renderer* renderer, int screen_width) {
         for (int i = 0; i < unsortedNumbersArray->size(); i++) {
@@ -52,9 +73,9 @@ public:
         SDL_RenderPresent(renderer);
     }
 
-    // A function to draw a rectangle to screen at a given x position 
-    void DrawCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX, int screen_width) {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    // A function to draw a rectangle to screen at a given x position and color
+    void DrawCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX, int screen_width, SDL_Color color){
+        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
         SDL_Rect rect;
         rect.x = posX * (screen_width / unsortedNumbersArray->size());
         rect.y = screen_width - (unsortedNumbersArray->at(posX) * (screen_width / unsortedNumbersArray->size()));
@@ -65,7 +86,7 @@ public:
 
     // A function that draws a black rectangle at a given x from y 0 : screen_width
     void ClearCurrentArrayAtIndex(SDL_Window* window, SDL_Renderer* renderer, int posX, int screen_width) {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 32, 32, 32, 255);
         SDL_Rect rect;
         rect.x = posX * (screen_width / unsortedNumbersArray->size());
         rect.y = 0;
@@ -127,6 +148,8 @@ public:
         }
     }
 
+    void setLastSortedValueIndex(int index) { last_red_sorted_value_index = index;  }
+
     // Using a set since we don't have to check if a random value is already in the set
     std::unordered_set<int> unsortedNumbersSet;
     // An unused vector to store rgb values 
@@ -135,4 +158,6 @@ public:
     std::vector<int>* unsortedNumbersArray;
     // A boolean to store whether the sorting algorithm has finished sorting
     bool isSorted = false;
+    int last_red_sorted_value_index = 0;
+    int last_green_sorted_value_index = 0;
 };

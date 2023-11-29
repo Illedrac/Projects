@@ -54,7 +54,8 @@ void SortingAlgorithmsMain::DisplayTextBoxes(int screen_width) {
 
 // Take in an Algorithm type and create the sorting_algorithm_implementation object with the corresponding algorithm
 void SortingAlgorithmsMain::SetAlgorithmType(AlgorithmType algorithm_type, int screen_width) {
-    int unsorted_array_size = screen_width / 2;
+    // Set the size of the unsorted array
+    int unsorted_array_size = screen_width / 10;
     sorting_algorithm_implementation = AlgorithmFactory::CreateAlgorithm(algorithm_type, screen_width, unsorted_array_size);
 }
 
@@ -67,7 +68,7 @@ void SortingAlgorithmsMain::ClearScreen() {
 // Used to draw the initial (unsorted) array prior to the user pressing 'r' to run the algorithm
 void SortingAlgorithmsMain::DrawInitialArray(int screen_width) {
    
-    sorting_algorithm_implementation->DrawCurrentArray(window, renderer, screen_width);
+    sorting_algorithm_implementation->DrawInitialArray(window, renderer, screen_width);
     
     // swap and display buffer
     SDL_RenderPresent(renderer);
@@ -89,10 +90,11 @@ void SortingAlgorithmsMain::Initialize(int screen_width) {
     text_boxes_vector.push_back(new TextBox(renderer, path_to_font, 35, text_box_width, text_box_height, "Sorting Algorithm Visualizer"));
     text_boxes_vector.push_back(new TextBox(renderer, path_to_font, 15, text_box_width/2, text_box_height/3, "Choose A Sorting Algorithm"));
     text_boxes_vector.push_back(new TextBox(renderer, path_to_font, 15, text_box_width / 2, text_box_height , "Insertion Sort"));
-    text_boxes_vector.push_back(new TextBox(renderer, path_to_font, 15, text_box_width / 2, text_box_height, "Binary Insertion Sort"));
+    //text_boxes_vector.push_back(new TextBox(renderer, path_to_font, 15, text_box_width / 2, text_box_height, "Binary Insertion Sort"));
     text_boxes_vector.push_back(new TextBox(renderer, path_to_font, 15, text_box_width / 2, text_box_height, "Selection Sort"));
     text_boxes_vector.push_back(new TextBox(renderer, path_to_font, 15, text_box_width / 2, text_box_height, "Quick Sort"));
 }
+
 
 // Main function
 int WinMain() {
@@ -190,7 +192,7 @@ int WinMain() {
                                             sAM->SetAlgorithmType(AlgorithmType::SELECTION_SORT, screen_width);
                                         }
                                         else if (current_text_box->message == "Quick Sort") {
-                                            sAM->SetAlgorithmType(AlgorithmType::SELECTION_SORT, screen_width);
+                                            sAM->SetAlgorithmType(AlgorithmType::QUICK_SORT, screen_width);
                                         }
 
                                         main_menu = false;
@@ -242,7 +244,16 @@ int WinMain() {
                         continue_running_program = SDL_FALSE;
                         break;
                     }
-                    break;
+                    // 
+                    else if (event.key.keysym.scancode == SDL_SCANCODE_M && sAM->sorting_algorithm_implementation && sAM->sorting_algorithm_implementation->isSorted) {
+                        main_menu = true;
+                        sAM->sorting_algorithm_implementation = nullptr;
+                        SDL_SetRenderDrawColor(sAM->renderer, 0, 0, 0, 255);
+                        SDL_RenderClear(sAM->renderer);
+                        display_initial_array = true;
+                        break;
+                    }
+                    
                 default:
                     break;
                 }
@@ -251,12 +262,110 @@ int WinMain() {
         
         // If the sorting_algorithm_implementation isn't nullptr and the array has been sorted
         // Then clear the screen and go back to the main menu
-        if (sAM->sorting_algorithm_implementation && sAM->sorting_algorithm_implementation->isSorted) {
-            main_menu = true;
-            sAM->sorting_algorithm_implementation = nullptr;
-            SDL_SetRenderDrawColor(sAM->renderer, 0, 0, 0, 255);
-            SDL_RenderClear(sAM->renderer);
-            display_initial_array = true;
+       
+
+        // Frame rate variable updating / checking
+        frame_time = SDL_GetTicks() - frame_start;
+        if (frame_delay > frame_time) {
+            SDL_Delay(frame_delay - frame_time);
+        }
+
+
+    }
+    
+    return 0;
+}
+
+/*
+// Copy of WinMain for testing
+// In regards to coloring current swaps in red, likely need to keep track of the last X index
+// With that, when going to draw, update the last index to be colored white, and color the
+// Current index in red
+int WinMain() {
+
+
+    std::vector<int> numbers;
+
+    for (int i = 1; i < 250; i++) {
+        numbers.push_back(i);
+    }
+
+
+
+    // Screen width in pixels
+    int screen_width = 1000;
+    // Const variables to control frame rate to 60 FPS
+    const int FPS = 60;
+    const int frame_delay = 1000 / FPS;
+
+    // More variables to control frame rate
+    Uint32 frame_start;
+    int frame_time;
+
+    // Create the main driving object
+    SortingAlgorithmsMain* sAM = new SortingAlgorithmsMain(screen_width, screen_width);
+    sAM->Initialize(screen_width);
+
+    // Event variable for event handling
+    SDL_Event event;
+    // Boolean to determine if to continue running the program
+    bool continue_running_program = SDL_TRUE;
+    // Boolean to determine whether or not to enable full screen -> Doesn't work but that's okay for now
+    bool full_screen = false;
+    // Boolean to determine whether or not to display the initial (unsorted) array after selecting an algorithm
+    //bool display_initial_array = true;
+    // Boolean to determine whether or not to display the main menus
+    //bool main_menu = true;
+    
+    sAM->SetAlgorithmType(AlgorithmType::INSERTION_SORT, screen_width);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->clear();
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(4);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(1);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(9);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(5);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(7);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(2);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(10);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(3);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(6);
+    sAM->sorting_algorithm_implementation->unsortedNumbersArray->push_back(8);
+    
+    sAM->DrawInitialArray(screen_width);
+
+
+    // Main program loop
+    while (continue_running_program) {
+
+        frame_start = SDL_GetTicks();
+
+        // Loop to drive event handling
+        while (SDL_PollEvent(&event)) {
+
+
+            // Quit if user clicks "X" button
+            switch (event.type) {
+            case SDL_QUIT:
+                continue_running_program = SDL_FALSE;
+                break;
+
+                // If the user presses a key
+            case SDL_KEYDOWN:
+
+                // Otherwise, if the user presses 'r', begin running the sorting algorithm
+                if (event.key.keysym.scancode == SDL_SCANCODE_R) {
+                    continue_running_program = sAM->sorting_algorithm_implementation->SortArray(sAM->window, sAM->renderer);
+                    break;
+                }
+                // Otherwise, if the user presses the ESCAPE key, quit
+                else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+                    continue_running_program = SDL_FALSE;
+                    break;
+                }
+                break;
+            default:
+                break;
+            }
+
         }
 
         // Frame rate variable updating / checking
@@ -267,10 +376,6 @@ int WinMain() {
 
 
     }
-
-
-
-   
-    
     return 0;
 }
+*/

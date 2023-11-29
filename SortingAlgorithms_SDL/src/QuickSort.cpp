@@ -16,7 +16,6 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
     //Index of smaller element and Indicate
     //the right position of pivot found so far
     int i = (low - 1);
-
     for (int j = low; j <= high; j++)
     {
 
@@ -79,67 +78,7 @@ bool QuickSort::SortArray(SDL_Window* window, SDL_Renderer* renderer, int low, i
 }
 
 bool QuickSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
-    bool res = SortArrayLR(window, renderer, 0, unsortedNumbersArray->size() - 1);//SortArray(window, renderer, 0, unsortedNumbersArray->size() - 1);
+    bool res = SortArray(window, renderer, 0, unsortedNumbersArray->size() - 1);//SortArray(window, renderer, 0, unsortedNumbersArray->size() - 1);
     return res;
 }
 
-bool QuickSort::SortArrayLR(SDL_Window* window, SDL_Renderer* renderer, int low, int high) {
-    if (low < high) {
-        int p = PartitionLR(window, renderer, low, high);
-        SortArrayLR(window, renderer, low, p);
-        SortArrayLR(window, renderer, p + 1, high);
-    }
-
-    return true;
-}
-
-int QuickSort::PartitionLR(SDL_Window* window, SDL_Renderer* renderer, int low, int high) {
-    int pivot = unsortedNumbersArray->at(low);
-    int i = low - 1;
-    int j = high + 1;
-
-    while (true) {
-        i += 1;
-        while(unsortedNumbersArray->at(i) < pivot) i += 1;
-        j -= 1;
-        while(unsortedNumbersArray->at(j) > pivot) j -= 1;
-        //handleDrawing(array, j, high, low, -1)
-
-        if (i >= j) return j;
-        
-        unsortedNumbersArray->at(i) = unsortedNumbersArray->at(j);
-        unsortedNumbersArray->at(j) = unsortedNumbersArray->at(i);
-
-        ClearCurrentArrayAtIndex(window, renderer, i, screen_width);
-        DrawCurrentArrayAtIndex(window, renderer, i, screen_width);
-        ClearCurrentArrayAtIndex(window, renderer, j, screen_width);
-        DrawCurrentArrayAtIndex(window, renderer, j, screen_width);
-
-        SDL_RenderPresent(renderer);
-    }
-}
-
-
-/*
-def quickSort_LR(array, low, high):
-    if low < high:
-        p = partition(array, low, high)
-        quickSort_LR(array, low, p)
-        quickSort_LR(array, p + 1, high)
-
-partition(array, low, high):
-    pivot = unsortedNumbersArray->at(low]
-    i = low - 1
-    j = high + 1
-    
-    while True:
-        i += 1
-        while unsortedNumbersArray->at(i] < pivot: i += 1
-        
-        j -= 1
-        while unsortedNumbersArray->at(j] > pivot: j -= 1
-        
-        handleDrawing(array, j, high, low, -1)
-        if i >= j: return j
-        unsortedNumbersArray->at(i], unsortedNumbersArray->at(j] = unsortedNumbersArray->at(j], unsortedNumbersArray->at(i]
-*/
