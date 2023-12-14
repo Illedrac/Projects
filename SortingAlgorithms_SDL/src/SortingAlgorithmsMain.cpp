@@ -102,7 +102,7 @@ int WinMain() {
     // Screen width in pixels
     int screen_width = 1000;
     // Const variables to control frame rate to 60 FPS
-    const int FPS = 60;
+    const int FPS = 120;
     const int frame_delay = 1000 / FPS;
 
     // More variables to control frame rate

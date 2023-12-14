@@ -13,15 +13,25 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
     //choose the pivot
 
     int pivot = unsortedNumbersArray->at(high);
+    
+    DrawCurrentArrayAtIndex(window, renderer, high, screen_width, SDL_Color{0, 255, 255, 255});
+    SDL_RenderPresent(renderer);
+    
+    if (!CheckSDLEvents())
+        return -1;
+
+    //SDL_Delay(15);
+
+    
+
     //Index of smaller element and Indicate
     //the right position of pivot found so far
-    int i = (low - 1);
+    int i = low - 1;
     for (int j = low; j <= high; j++)
     {
 
-        bool should_continue = CheckSDLEvents();
-        if (!should_continue)
-            return false;
+        if (!CheckSDLEvents())
+            return -1;
 
 
         //If current element is smaller than the pivot
@@ -30,26 +40,69 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
             //Increment index of smaller element
             i++;
 
-            std::swap(unsortedNumbersArray->at(i), unsortedNumbersArray->at(j));
             ClearCurrentArrayAtIndex(window, renderer, j, screen_width);
-            DrawCurrentArrayAtIndex(window, renderer, j, screen_width);
             ClearCurrentArrayAtIndex(window, renderer, i, screen_width);
-            DrawCurrentArrayAtIndex(window, renderer, i, screen_width);
+
+            DrawCurrentArrayAtIndex(window, renderer, j, screen_width, SDL_Color{ 255, 0, 0, 255 });
+            DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 0, 255, 0, 255 });
 
             SDL_RenderPresent(renderer);
+            //SDL_Delay(10);
 
+            std::swap(unsortedNumbersArray->at(i), unsortedNumbersArray->at(j));
+            
+            ClearCurrentArrayAtIndex(window, renderer, j, screen_width);
+            ClearCurrentArrayAtIndex(window, renderer, i, screen_width);
+
+            DrawCurrentArrayAtIndex(window, renderer, j, screen_width, SDL_Color{ 0, 255, 0, 255 });
+            DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 255, 0, 0, 255 });
+
+            SDL_RenderPresent(renderer);
+            //SDL_Delay(10);
+
+            ClearCurrentArrayAtIndex(window, renderer, j, screen_width);
+            ClearCurrentArrayAtIndex(window, renderer, i, screen_width);
+            
+            DrawCurrentArrayAtIndex(window, renderer, j, screen_width, SDL_Color{ 255, 255, 255, 255 });
+            DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 255, 255, 255, 255 });
+            
+            SDL_RenderPresent(renderer);
+            //SDL_Delay(10);
         }
     }
+    DrawCurrentArrayAtIndex(window, renderer, high, screen_width, SDL_Color{ 255, 255, 255, 255 });
 
-    std::swap(unsortedNumbersArray->at(i + 1), unsortedNumbersArray->at(high));
-    
+
+
     ClearCurrentArrayAtIndex(window, renderer, i + 1, screen_width);
-    DrawCurrentArrayAtIndex(window, renderer, i + 1, screen_width);
     ClearCurrentArrayAtIndex(window, renderer, high, screen_width);
-    DrawCurrentArrayAtIndex(window, renderer, high , screen_width);
+
+    DrawCurrentArrayAtIndex(window, renderer, i + 1, screen_width, SDL_Color{ 255, 0, 0, 255 });
+    DrawCurrentArrayAtIndex(window, renderer, high , screen_width, SDL_Color{ 0, 255, 0, 255 });
 
     SDL_RenderPresent(renderer);
+    //SDL_Delay(10);
 
+    std::swap(unsortedNumbersArray->at(i + 1), unsortedNumbersArray->at(high));
+
+    ClearCurrentArrayAtIndex(window, renderer, i + 1, screen_width);
+    ClearCurrentArrayAtIndex(window, renderer, high, screen_width);
+
+    DrawCurrentArrayAtIndex(window, renderer, i + 1, screen_width, SDL_Color{ 0, 255, 0, 255 });
+    DrawCurrentArrayAtIndex(window, renderer, high, screen_width, SDL_Color{ 255, 0, 0, 255 });
+
+    SDL_RenderPresent(renderer);
+    SDL_Delay(15);
+
+    ClearCurrentArrayAtIndex(window, renderer, i + 1, screen_width);
+    ClearCurrentArrayAtIndex(window, renderer, high, screen_width);
+
+    DrawCurrentArrayAtIndex(window, renderer, i + 1, screen_width, SDL_Color{ 255, 255, 255, 255 });
+    DrawCurrentArrayAtIndex(window, renderer, high, screen_width, SDL_Color{ 255, 255, 255, 255 });
+
+    SDL_RenderPresent(renderer);
+    SDL_Delay(15);
+    
     return (i + 1);
 }
 
@@ -68,6 +121,7 @@ bool QuickSort::SortArray(SDL_Window* window, SDL_Renderer* renderer, int low, i
 
         int pi = Partition(window, renderer, low, high);
 
+        if (pi == -1) return false;
         //Recursion Call
         //smaller element than pivot goes left and
         //higher element goes right
@@ -79,6 +133,7 @@ bool QuickSort::SortArray(SDL_Window* window, SDL_Renderer* renderer, int low, i
 
 bool QuickSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
     bool res = SortArray(window, renderer, 0, unsortedNumbersArray->size() - 1);//SortArray(window, renderer, 0, unsortedNumbersArray->size() - 1);
+    isSorted = true;
     return res;
 }
 

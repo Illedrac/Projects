@@ -26,11 +26,11 @@ bool InsertionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
             //Present the renderer
             SDL_RenderPresent(renderer);
             
-            // Draw both rectanglea (green & red), back to white, not presenting yet
+            // Draw both rectangles (green & red), back to white, not presenting yet
             DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 255, 255, 255, 255});
             DrawCurrentArrayAtIndex(window, renderer, j, screen_width, SDL_Color{ 255, 255, 255, 255 });
 
-            SDL_Delay(10);
+            SDL_Delay(2);
             
 
             while (j >= 0 && unsortedNumbersArray->at(j) > key) {
@@ -52,7 +52,7 @@ bool InsertionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
                 }
 
                 SDL_RenderPresent(renderer);
-                SDL_Delay(10);
+                SDL_Delay(2);
 
                 DrawCurrentArrayAtIndex(window, renderer, j, screen_width, SDL_Color{ 255, 255, 255, 255 });
                 

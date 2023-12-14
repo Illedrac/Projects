@@ -148,8 +148,6 @@ public:
         }
     }
 
-    void setLastSortedValueIndex(int index) { last_red_sorted_value_index = index;  }
-
     // Using a set since we don't have to check if a random value is already in the set
     std::unordered_set<int> unsortedNumbersSet;
     // An unused vector to store rgb values 
@@ -158,6 +156,4 @@ public:
     std::vector<int>* unsortedNumbersArray;
     // A boolean to store whether the sorting algorithm has finished sorting
     bool isSorted = false;
-    int last_red_sorted_value_index = 0;
-    int last_green_sorted_value_index = 0;
 };

@@ -20,14 +20,14 @@ bool SelectionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
         SDL_RenderPresent(renderer);
 
         
-        SDL_Delay(2);
+        SDL_Delay(200);
 
         for (int i = step + 1; i < unsortedNumbersArray->size(); i++) {
 
             DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 255, 0, 0, 255 });
             SDL_RenderPresent(renderer);
             
-            SDL_Delay(2);
+            //SDL_Delay(2);
             
             DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 255, 255, 255, 255 });
 
@@ -52,13 +52,13 @@ bool SelectionSort::SortArray(SDL_Window* window, SDL_Renderer* renderer) {
         DrawCurrentArrayAtIndex(window, renderer, min_idx, screen_width, SDL_Color{ 0, 255, 0, 255 });
         
         SDL_RenderPresent(renderer);
-        SDL_Delay(100);
+        SDL_Delay(200);
 
         DrawCurrentArrayAtIndex(window, renderer, step, screen_width, SDL_Color{ 255, 255, 255, 255 });
         DrawCurrentArrayAtIndex(window, renderer, min_idx, screen_width, SDL_Color{ 255, 255, 255, 255 });
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(2);
+        SDL_Delay(200);
 
         /*
         ClearCurrentArrayAtIndex(window, renderer, min_idx, screen_width);
