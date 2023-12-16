@@ -3,9 +3,10 @@
 #include <set>
 #include <tuple>
 #include "SDL.h"
+#include "Edge.h"
+
 class GameBoard;
 class Edge;
-class Cell;
 
 class BFS_Algorithm {
 
@@ -14,16 +15,21 @@ public:
 	
 	void BeginSearch();
 	void Search(int row, int col);
+	void DrawFinishedPath(Edge* finished_edge);
 	void CreateAdjacencyMatrix();
-	std::vector<Edge> GetAdjacentEdges(Edge& cur_edge);
-	void DisplayCurrentEdge(Edge& cur_edge);
+	std::vector<Edge> GetAdjacentEdges(Edge& cur_edge, std::vector<Edge>& visted);
+	bool HasBeenVisited(int row, int col);
+	bool IsInQueue(int row, int col);
 
+	inline std::vector<Edge> getQueue() { return queue; }
+	inline std::vector<Edge> getVisited() { return visited; }
 
 private:
 	bool found_finish;
 	GameBoard* game_board;
 	std::vector<std::vector<int>> adjacency_matrix;
-	// I don't know what to name this
+	std::vector<Edge> queue;
+	std::vector<Edge> visited;
 
 
 };

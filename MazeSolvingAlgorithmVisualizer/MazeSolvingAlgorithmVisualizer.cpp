@@ -14,8 +14,8 @@ void GameLoop() {
 
 	int screen_width_px = 1910;
 	int screen_height_px = 1050;
-	int number_cells_width = 200;
-	int number_cells_height = 200;
+	int number_cells_width = 3;
+	int number_cells_height = 3;
 
 
 	SDL_CreateWindowAndRenderer(screen_width_px, screen_height_px, NULL, &window, &renderer);
@@ -46,6 +46,9 @@ void GameLoop() {
 		case SDL_KEYDOWN:
 	
 			switch (event.key.keysym.scancode) {
+				case SDL_SCANCODE_ESCAPE:
+					continue_running_program = false;
+					break;
 				case SDL_SCANCODE_B:
 					BFS.BeginSearch();
 					break;
