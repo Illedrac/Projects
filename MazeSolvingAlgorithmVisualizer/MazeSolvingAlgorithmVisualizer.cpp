@@ -14,8 +14,8 @@ void GameLoop() {
 
 	int screen_width_px = 1910;
 	int screen_height_px = 1050;
-	int number_cells_width = 3;
-	int number_cells_height = 3;
+	int number_cells_width = 200;
+	int number_cells_height = 200;
 
 
 	SDL_CreateWindowAndRenderer(screen_width_px, screen_height_px, NULL, &window, &renderer);
@@ -62,7 +62,7 @@ void GameLoop() {
 					current_draw_type = DRAW_START;
 					break;
 				case SDL_SCANCODE_R:
-					board = * (new GameBoard(window, renderer, number_cells_width, number_cells_height, screen_width_px - 2, screen_height_px - 1));
+					board = * (new GameBoard(window, renderer, number_cells_width, number_cells_height, screen_width_px - (int)(screen_width_px / number_cells_width), screen_height_px - (int)(0.75 * screen_height_px / number_cells_height)));
 					BFS = * (new BFS_Algorithm(&board));
 					break;
 				case SDL_SCANCODE_G:

@@ -106,7 +106,7 @@ void GameBoard::generateUniformRandNoise() {
 	std::uniform_int_distribution<int> row_dist(0, number_cells_height - 1);
 	std::uniform_int_distribution<int> col_dist(0, number_cells_width - 1);
 
-	int arbitrary_number_walls_generated = (number_cells_height + number_cells_width) ;
+	int arbitrary_number_walls_generated = (number_cells_height + number_cells_width) * 3 ;
 
 	int tried = 0;
 

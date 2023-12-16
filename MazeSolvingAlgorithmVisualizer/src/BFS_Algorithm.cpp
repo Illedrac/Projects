@@ -1,14 +1,15 @@
-#include <queue>
 #include "BFS_Algorithm.h"
 #include "GameBoard.h"
 #include "Cell.h"
+
 
 BFS_Algorithm::BFS_Algorithm(GameBoard* gB) :
 	found_finish(false),
 	game_board(gB),
 	adjacency_matrix(),
 	queue(),
-	visited()
+	visited(),
+	previous_map()
 {
 	CreateAdjacencyMatrix();
 }
@@ -21,19 +22,19 @@ void BFS_Algorithm::Search(int row, int col)
 {
 
 	Edge start(row, col);
-	queue.push_back(start);
+	queue.push_front(start);
 	visited.push_back(start);
+	previous_map[std::make_pair(row, col)] = std::make_pair(-1,-1);
 
 	game_board->DrawButDontDisplayCell(start.getRow(), start.getCol(), { 0, 255 , 0, 255 });
 
 	game_board->DisplayRenderer();
 
-	game_board->DrawButDontDisplayCell(start.getRow(), start.getCol(), { 100, 100, 100, 255 });
-
+	
 	while (!queue.empty()) {
-		Edge node = queue.at(0);
-		queue.erase(queue.begin());
-
+		Edge node = queue.front();
+		queue.pop_front();
+		
 
 		int r = std::min(255.0, ( ( 1.0 / (game_board->getCellsHeight() - 1 ) * node.getRow() ) * 255 ) );
 		int b = std::min(255.0, ((1.0 / (game_board->getCellsWidth() - 1) * node.getCol()) * 255)); 
@@ -53,10 +54,11 @@ void BFS_Algorithm::Search(int row, int col)
 		color.b = b;
 		color.a = 255;
 
-		game_board->DrawButDontDisplayCell(node.getRow(), node.getCol(), color);
+		if (node.getRow() != game_board->getStartRowPosition() || node.getCol() != game_board->getStartColPosition() ) {
+			game_board->DrawButDontDisplayCell(node.getRow(), node.getCol(), color);
 
-		game_board->DisplayRenderer();
-
+			game_board->DisplayRenderer();
+		}
 		//SDL_Delay(10);
 
 		//game_board->DrawButDontDisplayCell(node.getRow(), node.getCol(), { std::max(45, (double) r / 2), 100, 100, 255});
@@ -68,43 +70,52 @@ void BFS_Algorithm::Search(int row, int col)
 		game_board->DisplayRenderer();
 
 		*/
+		int adjacency_value = (game_board->getCellsWidth() * node.getRow()) + node.getCol();
 
-		std::vector<Edge> adjacent_edges = GetAdjacentEdges(node, visited);
+		std::vector<Edge> adjacent_edges = GetAdjacentEdges(adjacency_value, visited);
 
 		for (int i = 0; i < adjacent_edges.size(); i++) {
 	
 			Edge edge = adjacent_edges.at(i);
 
+			previous_map[std::make_pair(edge.getRow(), edge.getCol())] = std::make_pair(node.getRow(), node.getCol());
+
 			if (edge.getRow() == game_board->getFinishRowPosition() && edge.getCol() == game_board->getFinishColPosition()) {
 				
-				edge.setPrevEdge(&node);
-
-				DrawFinishedPath(&edge);
+				DrawFinishedPath(edge.getRow(), edge.getCol());
 				
 				found_finish = true;
 				
 				return;
 			}
-
-			edge.setPrevEdge(&node);
+						
 			queue.push_back(edge);
 			visited.push_back(edge);
 		}
 	}
 }
 
-void BFS_Algorithm::DrawFinishedPath(Edge* finished_edge) {
-	
-	while (finished_edge != nullptr) {
-		
-		game_board->DrawButDontDisplayCell(finished_edge->getRow(), finished_edge->getCol(), {255, 255 , 0, 255});
+void BFS_Algorithm::DrawFinishedPath(const int& row, const int& col) {
 
-		finished_edge = finished_edge->getPrevEdge();
+	int tempRow = row;
+	int tempCol = col;
+	while (previous_map[std::make_pair(tempRow, tempCol)] != std::make_pair(-1,-1)) {
 		
-		game_board->DisplayRenderer();
+		if(tempRow != row || tempCol != col){
+			game_board->DrawButDontDisplayCell(tempRow, tempCol, {255, 155, 0, 255});
+			game_board->DisplayRenderer();
+		}
+
+		std::pair<int, int> tempPair = previous_map.at(std::make_pair(tempRow, tempCol));
+		tempRow = tempPair.first;
+		tempCol = tempPair.second;
+
+		SDL_Delay(5);
 	}
 
-	game_board->DisplayRenderer();
+	//game_board->DrawButDontDisplayCell(tempRow, tempCol, {255, 255, 0, 255});
+
+	//game_board->DisplayRenderer();
 }
 
 // Could probably be optimized
@@ -144,11 +155,11 @@ void BFS_Algorithm::CreateAdjacencyMatrix() {
 }
 
 
-std::vector<Edge> BFS_Algorithm::GetAdjacentEdges(Edge& cur_edge, std::vector<Edge>& visited) {
+std::vector<Edge> BFS_Algorithm::GetAdjacentEdges(int& adjacency_value, std::vector<Edge>& visted) {
 	
 	std::vector<Edge> adjacent_edges;
 
-	int adjacency_value = ( game_board->getCellsWidth() * cur_edge.getRow() ) + cur_edge.getCol();
+	
 
 	for (int i = 0; i < adjacency_matrix.at(adjacency_value).size(); i++) {
 		
@@ -163,7 +174,6 @@ std::vector<Edge> BFS_Algorithm::GetAdjacentEdges(Edge& cur_edge, std::vector<Ed
 				!IsInQueue(adjacent_row, adjacent_col))
 			{
 				Edge temp(adjacent_row, adjacent_col);
-				temp.setPrevEdge(&cur_edge);
 				adjacent_edges.push_back(temp);
 			}
 		}

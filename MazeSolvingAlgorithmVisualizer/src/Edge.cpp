@@ -2,20 +2,8 @@
 
 Edge::Edge(int row, int col) :
 	row(row),
-	col(col),
-	prev_edge(nullptr)
+	col(col)
 {
-}
-
-Edge::Edge(int row, int col, Edge* p_edge) :
-	row(row),
-	col(col),
-	prev_edge(p_edge)
-{
-}
-
-void Edge::setPrevEdge(Edge* p_edge) {
-	prev_edge = p_edge;
 }
 
 bool Edge::operator==(const Edge& rhs)
