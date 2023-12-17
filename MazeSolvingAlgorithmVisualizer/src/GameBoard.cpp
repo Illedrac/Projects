@@ -25,6 +25,7 @@ GameBoard::GameBoard(SDL_Window* window,
 
 
 void GameBoard::InitializeGameBoard() {
+	
 	for (int row = 0; row < number_cells_height; row++) {
 
 		std::vector<Cell> temp;

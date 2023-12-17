@@ -30,7 +30,7 @@ void BFS_Algorithm::Search(int row, int col)
 
 	game_board->DisplayRenderer();
 
-	
+
 	while (!queue.empty()) {
 		Edge node = queue.front();
 		queue.pop_front();
@@ -58,6 +58,8 @@ void BFS_Algorithm::Search(int row, int col)
 			game_board->DrawButDontDisplayCell(node.getRow(), node.getCol(), color);
 
 			game_board->DisplayRenderer();
+
+			SDL_Delay(200);
 		}
 		//SDL_Delay(10);
 
@@ -102,7 +104,7 @@ void BFS_Algorithm::DrawFinishedPath(const int& row, const int& col) {
 	while (previous_map[std::make_pair(tempRow, tempCol)] != std::make_pair(-1,-1)) {
 		
 		if(tempRow != row || tempCol != col){
-			game_board->DrawButDontDisplayCell(tempRow, tempCol, {255, 155, 0, 255});
+			game_board->DrawButDontDisplayCell(tempRow, tempCol, {255, 255, 0, 255});
 			game_board->DisplayRenderer();
 		}
 
@@ -123,6 +125,34 @@ void BFS_Algorithm::CreateAdjacencyMatrix() {
 
 	int adjacency_one_dimension_length = (game_board->getCellsHeight() * game_board->getCellsWidth());
 
+	int cells_width = game_board->getCellsWidth();
+
+
+	for (int adjacency_value = 0; adjacency_value < adjacency_one_dimension_length; adjacency_value++) {
+
+		std::vector<int> temp_adjacency_values(adjacency_one_dimension_length, 0);
+
+		// If it's not the on the left side, add the one to the left of it
+		if (adjacency_value % cells_width != 0)
+			temp_adjacency_values.at(adjacency_value - 1) = 1;
+
+		// If it's on the right side, add the one to the right of it
+		if (adjacency_value % (cells_width - 1) != 0)
+			temp_adjacency_values.at(adjacency_value + 1) = 1;
+
+		// If it's not on the top row, add the one above it
+		if (adjacency_value >= cells_width)
+			temp_adjacency_values.at(adjacency_value - cells_width) = 1;
+
+		// If it's not on the bottom row, add the one below it
+		if (adjacency_value < ( (game_board->getCellsHeight() - 1) * cells_width))
+			temp_adjacency_values.at(adjacency_value + cells_width) = 1;
+	
+		adjacency_matrix.push_back(temp_adjacency_values);
+	}
+
+
+	/*
 	for (int r = 0; r < game_board->getCellsHeight(); r++) {
 	
 		for (int c = 0; c < game_board->getCellsWidth(); c++) {
@@ -152,6 +182,8 @@ void BFS_Algorithm::CreateAdjacencyMatrix() {
 		}
 
 	}
+
+	*/
 }
 
 
