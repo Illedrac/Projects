@@ -29,6 +29,8 @@ public:
 	void setFinishPosition(int row, int col);
 	void ClearBoard();
 	
+	bool readyToStartSearch();
+
 	inline int getScreenWidth() { return screen_width_px; }
 	inline int getScreenHeight() { return screen_height_px; }
 	

@@ -181,3 +181,11 @@ void GameBoard::ClearBoard() {
 	DrawGameBoard();
 
 }
+
+bool GameBoard::readyToStartSearch() {
+
+	return start_row_position != -1  &&
+		   start_col_position != -1  &&
+   		   finish_col_position != -1 &&
+		   finish_col_position != -1;
+}

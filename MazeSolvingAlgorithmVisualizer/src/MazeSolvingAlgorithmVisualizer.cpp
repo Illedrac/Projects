@@ -14,12 +14,12 @@ enum DRAW_TYPE {
 
 void CreateButtons(SDL_Renderer* renderer, std::vector<Button>& buttons) {
 	
-	Button Search_button(renderer, "Search_button.JPG", SDL_GetBasePath(), 10, BUTTON_TYPE::BUTTON_SEARCH);
-	Button Start_button(renderer, "Start_button.JPG", SDL_GetBasePath(), 120, BUTTON_TYPE::BUTTON_START);
-	Button Finish_button(renderer, "Finish_button.JPG", SDL_GetBasePath(), 230, BUTTON_TYPE::BUTTON_FINISH);
-	Button Maze_button(renderer, "Maze_button.JPG", SDL_GetBasePath(), 340, BUTTON_TYPE::BUTTON_MAZE);
-	Button Add_Walls_button(renderer, "Add_Walls_button.JPG", SDL_GetBasePath(), 450, BUTTON_TYPE::BUTTON_ADD_WALLS);
-	Button Reset_button(renderer, "Reset_button.JPG", SDL_GetBasePath(), 560, BUTTON_TYPE::BUTTON_RESET);
+	Button Search_button(renderer, "Search_button", SDL_GetBasePath(), 10, BUTTON_TYPE::BUTTON_SEARCH);
+	Button Start_button(renderer, "Start_button", SDL_GetBasePath(), 120, BUTTON_TYPE::BUTTON_START);
+	Button Finish_button(renderer, "Finish_button", SDL_GetBasePath(), 230, BUTTON_TYPE::BUTTON_FINISH);
+	Button Maze_button(renderer, "Maze_button", SDL_GetBasePath(), 340, BUTTON_TYPE::BUTTON_MAZE);
+	Button Add_Walls_button(renderer, "Add_Walls_button", SDL_GetBasePath(), 450, BUTTON_TYPE::BUTTON_ADD_WALLS);
+	Button Reset_button(renderer, "Reset_button", SDL_GetBasePath(), 560, BUTTON_TYPE::BUTTON_RESET);
 
 	buttons.push_back(Search_button);
 	buttons.push_back(Start_button);
@@ -31,17 +31,50 @@ void CreateButtons(SDL_Renderer* renderer, std::vector<Button>& buttons) {
 }
 
 void DrawButtons(SDL_Renderer* renderer, std::vector<Button>& buttons){
-	
+
 	for (Button b : buttons) {
 		SDL_RenderCopy(renderer, b.getTexture(), NULL, &b.getRect());
 	}
 	
 }
 
+void DrawButtonForAMoment(SDL_Renderer* renderer, Button& b) {
+	b.setSelected(true);
+	SDL_RenderCopy(renderer, b.getTexture(), NULL, &b.getRect());
+	SDL_RenderPresent(renderer);
+	SDL_Delay(75);
+	b.setSelected(false);
+	SDL_RenderCopy(renderer, b.getTexture(), NULL, &b.getRect());
+	SDL_RenderPresent(renderer);
+}
+
+void UnselectButton(BUTTON_TYPE type, std::vector<Button>& buttons) {
+	switch (type) {
+		case BUTTON_TYPE::BUTTON_SEARCH:
+			buttons.at(0).setSelected(false);
+			return;
+		case BUTTON_TYPE::BUTTON_START:
+			buttons.at(1).setSelected(false);
+			return;
+		case BUTTON_TYPE::BUTTON_FINISH:
+			buttons.at(2).setSelected(false);
+			return;
+		case BUTTON_TYPE::BUTTON_MAZE:
+			buttons.at(3).setSelected(false);
+			return;
+		case BUTTON_TYPE::BUTTON_ADD_WALLS:
+			buttons.at(4).setSelected(false);
+			return;
+		case BUTTON_TYPE::BUTTON_RESET:
+			buttons.at(5).setSelected(false);
+			return;
+	}
+}
+
 void GameLoop() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_JPG);
-	
+
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 
@@ -68,6 +101,7 @@ void GameLoop() {
 	bool finish_already_drawn = false;
 	bool start_already_drawn = false;
 
+	BUTTON_TYPE selected_button = BUTTON_TYPE::BUTTON_NONE;
 
 	SDL_Event event;
 	
@@ -78,7 +112,8 @@ void GameLoop() {
 	BFS_Algorithm BFS(&board);
 
 	while (continue_running_program) {
-		board.DrawGameBoard();
+		if(board.update_made)
+			board.DrawGameBoard();
 		SDL_PollEvent(&event);
 
 		switch (event.type) {
@@ -243,28 +278,66 @@ void GameLoop() {
 						SDL_Rect& rect = b.getRect();
 
 						if (mouse_x >= rect.x && mouse_x <= (rect.x + rect.w) && mouse_y >= rect.y && mouse_y <= (rect.y + rect.h)) {
+							
+							if (selected_button != BUTTON_TYPE::BUTTON_NONE)
+								UnselectButton(selected_button, buttons);
+
 							switch (b.getButtonType()) {
 								case BUTTON_TYPE::BUTTON_SEARCH:
-									continue_running_program = BFS.BeginSearch();
+									DrawButtonForAMoment(renderer, b);
+									
+									if(board.readyToStartSearch())
+										continue_running_program = BFS.BeginSearch();
 									break;
+
 								case BUTTON_TYPE::BUTTON_START:
+									
+									
+									
+									selected_button = BUTTON_TYPE::BUTTON_START;
 									current_draw_type = DRAW_TYPE::DRAW_START;
+									b.setSelected(true);
+									DrawButtons(renderer, buttons);
+									SDL_RenderPresent(renderer);
 									break;
+
 								case BUTTON_TYPE::BUTTON_FINISH:
+									
+									selected_button = BUTTON_TYPE::BUTTON_FINISH;
 									current_draw_type = DRAW_TYPE::DRAW_FINISH;
+									b.setSelected(true);
+									DrawButtons(renderer, buttons);
+									SDL_RenderPresent(renderer);
 									break;
+								
 								case BUTTON_TYPE::BUTTON_MAZE:
+
+									selected_button = BUTTON_TYPE::BUTTON_MAZE;
 									current_draw_type = DRAW_TYPE::DRAW_MAZE;
+									b.setSelected(true);
+									DrawButtons(renderer, buttons);
+									SDL_RenderPresent(renderer);
 									break;
+								
 								case BUTTON_TYPE::BUTTON_ADD_WALLS:
+									DrawButtonForAMoment(renderer, b);
 									board.generateUniformRandNoise();
+									
 									break;
+								
 								case BUTTON_TYPE::BUTTON_RESET:
+								
+									DrawButtonForAMoment(renderer, b);
+
 									SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 									SDL_RenderClear(renderer);
 									DrawButtons(renderer, buttons);
 									board.ClearBoard();
 									BFS.ClearBoard();
+
+									for (Button& b : buttons) {
+										b.setSelected(false);
+									}
 
 									// Instead of having booleans for these we could just check if the boards stored finish & start positions are -1, -1
 									finish_already_drawn = false;
@@ -273,6 +346,7 @@ void GameLoop() {
 							}
 						}
 					}
+
 				}
 
 			}

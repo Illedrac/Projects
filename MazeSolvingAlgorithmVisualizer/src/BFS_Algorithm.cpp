@@ -188,3 +188,4 @@ void BFS_Algorithm::ClearBoard() {
 	visited.clear();
 	previous_map.clear();
 }
+
