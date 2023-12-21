@@ -15,11 +15,13 @@ class BFS_Algorithm {
 public:
 	BFS_Algorithm(GameBoard* gB);
 	
-	void BeginSearch();
-	void Search(int row, int col);
+	bool BeginSearch();
+	bool Search(int row, int col);
 	void DrawFinishedPath(const int& row, const int& col);
 	void CreateAdjacencyMatrix();
-	
+	void ClearBoard();
+
+
 	std::vector<Edge> GetAdjacentEdges(int& adjacency_value, std::vector<Edge>& visted);
 	bool HasBeenVisited(int row, int col);
 	bool IsInQueue(int row, int col);
