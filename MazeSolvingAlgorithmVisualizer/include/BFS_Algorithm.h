@@ -18,11 +18,13 @@ public:
 	bool BeginSearch();
 	bool Search(int row, int col);
 	void DrawFinishedPath(const int& row, const int& col);
-	void CreateAdjacencyMatrix();
 	void ClearBoard();
 
-
+	std::vector<std::vector<int>> CreateAdjacencyMatrix(const int& total_number_threads, const int& thread_number);
+	void CreateAdjacencyMatrixOld();
 	std::vector<Edge> GetAdjacentEdges(int& adjacency_value, std::vector<Edge>& visted);
+	std::vector<Edge> GetAdjacentEdgesOld(int& adjacency_value, std::vector<Edge>& visted);
+
 	bool HasBeenVisited(int row, int col);
 	bool IsInQueue(int row, int col);
 
