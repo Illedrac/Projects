@@ -185,6 +185,21 @@ void GameBoard::ClearBoard() {
 
 }
 
+void GameBoard::SetAllCellsToWalls() {
+
+	start_row_position = -1;
+	start_col_position = -1;
+
+	finish_row_position = -1;
+	finish_col_position = -1;
+
+	for (int col = 0; col < number_cells_width; col++) {
+		for (int row = 0; row < number_cells_height; row++) {
+			gameBoard.at(row).at(col) = CELL_TYPE::WALL;
+		}
+	}
+}
+
 bool GameBoard::readyToStartSearch() {
 
 	return start_row_position != -1  &&

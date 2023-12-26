@@ -1,10 +1,11 @@
+#include <string>
+#include <algorithm>
 #include "SDL.h"
 #include "GameBoard.h"
 #include "Button.h"
 #include "BFS_Algorithm.h"
 #include "SDL_image.h"
-#include <string>
-#include <algorithm>
+#include "MazeGenerator.h"
 
 enum DRAW_TYPE {
 	DRAW_MAZE,
@@ -115,7 +116,7 @@ void GameLoop() {
 	DrawButtons(renderer, buttons);
 
 	GameBoard board(window, renderer, number_cells_width, number_cells_height, screen_width_px - 160, screen_height_px - 50);
-
+	MazeGenerator maze_generator(&board);
 
 	bool continue_running_program = SDL_TRUE;
 	bool mouse_button_held = false;
@@ -154,22 +155,51 @@ void GameLoop() {
 	
 			switch (event.key.keysym.scancode) {
 				case SDL_SCANCODE_ESCAPE:
+					
 					continue_running_program = false;
 					break;
 				case SDL_SCANCODE_B:
+
+					DrawButtonForAMoment(renderer, buttons.at(0));
 					
-					continue_running_program = BFS.BeginSearch();
+					if (board.readyToStartSearch())
+						continue_running_program = BFS.BeginSearch();
+					
 					break;
+				
 				case SDL_SCANCODE_F:
-					current_draw_type = DRAW_FINISH;
+
+					UnselectButton(selected_button, buttons);
+					selected_button = BUTTON_TYPE::BUTTON_FINISH;
+					current_draw_type = DRAW_TYPE::DRAW_FINISH;
+					buttons.at(2).setSelected(true);
+					DrawButtons(renderer, buttons);
+					SDL_RenderPresent(renderer);
 					break;
+				
 				case SDL_SCANCODE_M:
-					current_draw_type = DRAW_MAZE;
+
+					UnselectButton(selected_button, buttons);
+					selected_button = BUTTON_TYPE::BUTTON_MAZE;
+					current_draw_type = DRAW_TYPE::DRAW_MAZE;
+					buttons.at(3).setSelected(true);
+					DrawButtons(renderer, buttons);
+					SDL_RenderPresent(renderer);
 					break;
+				
 				case SDL_SCANCODE_S:
+
+					UnselectButton(selected_button, buttons);
+					selected_button = BUTTON_TYPE::BUTTON_START;
 					current_draw_type = DRAW_START;
+					buttons.at(1).setSelected(true);
+					DrawButtons(renderer, buttons);
+					SDL_RenderPresent(renderer);
 					break;
+				
 				case SDL_SCANCODE_R:
+				
+					DrawButtonForAMoment(renderer, buttons.at(5));
 					SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 					SDL_RenderClear(renderer);
 					DrawButtons(renderer, buttons);
@@ -181,8 +211,11 @@ void GameLoop() {
 					start_already_drawn = false;
 					break;
 				case SDL_SCANCODE_G:
-					board.generateUniformRandNoise();
+					
+					DrawButtonForAMoment(renderer, buttons.at(4));
+					maze_generator.generate();
 					break;
+
 				default:
 					break;
 			}
@@ -297,6 +330,7 @@ void GameLoop() {
 
 							switch (b.getButtonType()) {
 								case BUTTON_TYPE::BUTTON_SEARCH:
+									
 									DrawButtonForAMoment(renderer, b);
 									
 									if(board.readyToStartSearch())
@@ -304,8 +338,6 @@ void GameLoop() {
 									break;
 
 								case BUTTON_TYPE::BUTTON_START:
-									
-									
 									
 									selected_button = BUTTON_TYPE::BUTTON_START;
 									current_draw_type = DRAW_TYPE::DRAW_START;
@@ -333,9 +365,13 @@ void GameLoop() {
 									break;
 								
 								case BUTTON_TYPE::BUTTON_ADD_WALLS:
-									DrawButtonForAMoment(renderer, b);
-									board.generateUniformRandNoise();
 									
+									DrawButtonForAMoment(renderer, b);
+									maze_generator.generate();
+									
+									start_already_drawn = false;
+									finish_already_drawn = false;
+
 									break;
 								
 								case BUTTON_TYPE::BUTTON_RESET:

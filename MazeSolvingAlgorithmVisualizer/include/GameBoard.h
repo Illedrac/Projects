@@ -29,6 +29,7 @@ public:
 	void setStartPosition(int row, int col);
 	void setFinishPosition(int row, int col);
 	void ClearBoard();
+	void SetAllCellsToWalls();
 	
 	bool readyToStartSearch();
 

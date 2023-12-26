@@ -115,6 +115,7 @@ bool BFS_Algorithm::Search(int row, int col)
 			visited.push_back(edge);
 		}
 	}
+	return true;
 }
 
 void BFS_Algorithm::DrawFinishedPath(const int& row, const int& col) {
@@ -132,7 +133,7 @@ void BFS_Algorithm::DrawFinishedPath(const int& row, const int& col) {
 		tempRow = tempPair.first;
 		tempCol = tempPair.second;
 
-		SDL_Delay(5);
+		SDL_Delay(1);
 	}
 }
 
