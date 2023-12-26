@@ -12,7 +12,10 @@ enum DRAW_TYPE {
 	DRAW_FINISH
 };
 
-void CreateButtons(SDL_Renderer* renderer, std::vector<Button>& buttons) {
+// I don't really know how buttons shouuld work in SDL2 so I just create button instances that hold a texture and 
+// to check if a user clicks the button I just check x and y values of the mouse click. Not very good but the UI is not the
+// focus of this project 
+void CreateButtons(SDL_Renderer* renderer, std::vector<Button>& buttons, DRAW_TYPE current_draw_type) {
 	
 	Button Search_button(renderer, "Search_button", SDL_GetBasePath(), 10, BUTTON_TYPE::BUTTON_SEARCH);
 	Button Start_button(renderer, "Start_button", SDL_GetBasePath(), 120, BUTTON_TYPE::BUTTON_START);
@@ -27,6 +30,20 @@ void CreateButtons(SDL_Renderer* renderer, std::vector<Button>& buttons) {
 	buttons.push_back(Maze_button);
 	buttons.push_back(Add_Walls_button);
 	buttons.push_back(Reset_button);
+
+
+	// This should eventually be updated to be better, it kinda sucks atm
+	switch (current_draw_type) {
+		case DRAW_TYPE::DRAW_START:
+			buttons.at(1).setSelected(true);
+			break;
+		case DRAW_TYPE::DRAW_FINISH:
+			buttons.at(2).setSelected(true);
+			break;
+		case DRAW_TYPE::DRAW_MAZE:
+			buttons.at(3).setSelected(true);
+			break;
+	}
 
 }
 
@@ -47,6 +64,7 @@ void DrawButtonForAMoment(SDL_Renderer* renderer, Button& b) {
 	SDL_RenderCopy(renderer, b.getTexture(), NULL, &b.getRect());
 	SDL_RenderPresent(renderer);
 }
+
 
 void UnselectButton(BUTTON_TYPE type, std::vector<Button>& buttons) {
 	switch (type) {
@@ -71,6 +89,7 @@ void UnselectButton(BUTTON_TYPE type, std::vector<Button>& buttons) {
 	}
 }
 
+// This really needs to be cleaned up 
 void GameLoop() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_JPG);
@@ -90,7 +109,9 @@ void GameLoop() {
 
 	std::string path_to_font = SDL_GetBasePath();
 	
-	CreateButtons(renderer, buttons);
+	DRAW_TYPE current_draw_type = DRAW_MAZE;
+
+	CreateButtons(renderer, buttons, current_draw_type);
 	DrawButtons(renderer, buttons);
 
 	GameBoard board(window, renderer, number_cells_width, number_cells_height, screen_width_px - 160, screen_height_px - 50);
@@ -101,12 +122,23 @@ void GameLoop() {
 	bool finish_already_drawn = false;
 	bool start_already_drawn = false;
 
-	BUTTON_TYPE selected_button = BUTTON_TYPE::BUTTON_NONE;
+	BUTTON_TYPE selected_button;
+
+	switch (current_draw_type) {
+		case DRAW_TYPE::DRAW_START:
+			selected_button = BUTTON_START;
+			break;
+		case DRAW_TYPE::DRAW_FINISH:
+			selected_button = BUTTON_FINISH;
+			break;
+		case DRAW_TYPE::DRAW_MAZE:
+			selected_button = BUTTON_MAZE;
+			break;
+
+	}
 
 	SDL_Event event;
 	
-	DRAW_TYPE current_draw_type = DRAW_MAZE;
-
 	int mouse_x, mouse_y;
 
 	BFS_Algorithm BFS(&board);
@@ -125,6 +157,7 @@ void GameLoop() {
 					continue_running_program = false;
 					break;
 				case SDL_SCANCODE_B:
+					
 					continue_running_program = BFS.BeginSearch();
 					break;
 				case SDL_SCANCODE_F:
@@ -221,54 +254,35 @@ void GameLoop() {
 
 					}
 					else if (current_draw_type == DRAW_START) {
-						// Start isn't drawn so draw it
-						if (!start_already_drawn) {
-							board.gameBoard.at(row_index).at(col_index) = CELL_TYPE::START;
-							board.setStartPosition(row_index, col_index);
-
+						
+						if (board.getStartRowPosition() != -1 || board.getStartColPosition() != -1) {
+							board.gameBoard.at(board.getStartRowPosition()).at(board.getStartColPosition()) = CELL_TYPE::NORMAL_PATH;
+						}
+						else 
 							start_already_drawn = true;
 
-							board.update_made = true;
+						board.gameBoard.at(row_index).at(col_index) = CELL_TYPE::START;
+						board.setStartPosition(row_index, col_index);
 
-							board.DrawGameBoard();
-						}
-						// Start is drawn so unset current start
-						else if (board.gameBoard.at(row_index).at(col_index) == CELL_TYPE::START) {
-							board.gameBoard.at(row_index).at(col_index) = CELL_TYPE::NORMAL_PATH;
-							board.setStartPosition(-1, -1);
+						board.update_made = true;
 
-							start_already_drawn = false;
-
-							board.update_made = true;
-
-							board.DrawGameBoard();
-						}
+						board.DrawGameBoard();
+						
+						
 					}
 					else if (current_draw_type == DRAW_FINISH) {
-						// Finish isn't drawn so draw it
-						if (!finish_already_drawn) {
-							
-							board.gameBoard.at(row_index).at(col_index) = CELL_TYPE::FINISH;
-							board.setFinishPosition(row_index, col_index);
-
-							finish_already_drawn = true;
-
-							board.update_made = true;
-
-							board.DrawGameBoard();
+						if (board.getFinishRowPosition() != -1 || board.getFinishColPosition() != -1) {
+							board.gameBoard.at(board.getFinishRowPosition()).at(board.getFinishColPosition()) = CELL_TYPE::NORMAL_PATH;
 						}
-						// Finish is drawn so unset current start
-						else if (board.gameBoard.at(row_index).at(col_index) == CELL_TYPE::FINISH) {
-							
-							board.gameBoard.at(row_index).at(col_index) = CELL_TYPE::NORMAL_PATH;
-							board.setFinishPosition(-1, -1);
+						else
+							start_already_drawn = true;
 
-							finish_already_drawn = false;
+						board.gameBoard.at(row_index).at(col_index) = CELL_TYPE::FINISH;
+						board.setFinishPosition(row_index, col_index);
 
-							board.update_made = true;
+						board.update_made = true;
 
-							board.DrawGameBoard();
-						}
+						board.DrawGameBoard();
 					}
 				}
 				
@@ -279,8 +293,7 @@ void GameLoop() {
 
 						if (mouse_x >= rect.x && mouse_x <= (rect.x + rect.w) && mouse_y >= rect.y && mouse_y <= (rect.y + rect.h)) {
 							
-							if (selected_button != BUTTON_TYPE::BUTTON_NONE)
-								UnselectButton(selected_button, buttons);
+							UnselectButton(selected_button, buttons);
 
 							switch (b.getButtonType()) {
 								case BUTTON_TYPE::BUTTON_SEARCH:

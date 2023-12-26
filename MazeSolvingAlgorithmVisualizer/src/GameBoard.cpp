@@ -3,11 +3,11 @@
 #include <ctime>
 
 GameBoard::GameBoard(SDL_Window* window,
-					 SDL_Renderer* renderer,
-					 int num_cells_width,
-					 int num_cells_height,
-					 int screen_w_px,
-					 int screen_h_px) :
+	SDL_Renderer* renderer,
+	int num_cells_width,
+	int num_cells_height,
+	int screen_w_px,
+	int screen_h_px) :
 	update_made(true),
 	window(window),
 	renderer(renderer),
@@ -126,44 +126,47 @@ void GameBoard::DrawGameBoard() {
 }
 
 void GameBoard::generateUniformRandNoise() {
+	
 	std::default_random_engine generator(std::time(nullptr));
 	std::uniform_int_distribution<int> row_dist(0, number_cells_height - 1);
 	std::uniform_int_distribution<int> col_dist(0, number_cells_width - 1);
 
-	int arbitrary_number_walls_generated = (number_cells_height + number_cells_width) * 3 ;
-
-	int tried = 0;
+	int arbitrary_number_walls_generated = 1000 ;
 
 	for (int i = 0; i < arbitrary_number_walls_generated; i++) {
 		
-		if (tried > arbitrary_number_walls_generated * 2) return;
-
 		int row = row_dist(generator);
 		int col = col_dist(generator);
 
-		if (gameBoard.at(row).at(col) == CELL_TYPE::NORMAL_PATH)
-		{
-			gameBoard.at(row).at(col) = CELL_TYPE::WALL;
-		}else {
-			++tried;
-			i--;
+		// This is unsafe as the more walls you have, the longer the loop
+		// Eventually leading to an infinite loop. I'm acting under the assumption that 
+		// normal use of this program won't have all walls filled in -- oops
+		while (gameBoard.at(row).at(col) != CELL_TYPE::NORMAL_PATH) {
+			row = row_dist(generator);
+			col = col_dist(generator);
 		}
+
+		gameBoard.at(row).at(col) = CELL_TYPE::WALL;
+
 	}
 
 	update_made = true;
 
 	DrawGameBoard();
+	
 }
 
 
 void GameBoard::setStartPosition(int row, int col) {
 	start_row_position = row;
 	start_col_position = col;
+
 }
 
 void GameBoard::setFinishPosition(int row, int col) {
 	finish_row_position = row;
 	finish_col_position = col;
+	
 }
 
 void GameBoard::ClearBoard() {

@@ -1,6 +1,5 @@
 #include "BFS_Algorithm.h"
 #include "GameBoard.h"
-#include <chrono>
 #include <future>
 
 BFS_Algorithm::BFS_Algorithm(GameBoard* gB) :
@@ -50,6 +49,9 @@ bool BFS_Algorithm::Search(int row, int col)
 	visited.push_back(start);
 	previous_map[std::make_pair(row, col)] = std::make_pair(-1,-1);
 
+	std::pair<int, int> default_pair = std::make_pair(0, 0);
+	std::pair<int, int> current_pair_in_search;
+
 	game_board->DrawButDontDisplayCell(start.getRow(), start.getCol(), { 0, 255 , 0, 255 });
 
 	game_board->DisplayRenderer();
@@ -95,7 +97,10 @@ bool BFS_Algorithm::Search(int row, int col)
 	
 			Edge edge = adjacent_edges.at(i);
 
-			previous_map[std::make_pair(edge.getRow(), edge.getCol())] = std::make_pair(node.getRow(), node.getCol());
+			current_pair_in_search = std::make_pair(edge.getRow(), edge.getCol());
+			
+			if(previous_map[current_pair_in_search] == default_pair)
+				previous_map[current_pair_in_search] = std::make_pair(node.getRow(), node.getCol());
 
 			if (edge.getRow() == game_board->getFinishRowPosition() && edge.getCol() == game_board->getFinishColPosition()) {
 				
@@ -132,7 +137,6 @@ void BFS_Algorithm::DrawFinishedPath(const int& row, const int& col) {
 }
 
 std::vector<std::vector<int>> BFS_Algorithm::CreateAdjacencyMatrix(const int& total_number_threads, const int& thread_number) {
-//std::vector<std::vector<int>> BFS_Algorithm::CreateAdjacencyMatrix(const int& total_number_threads, const int& thread_number) {
 	
 	int adjacency_one_dimension_length = (game_board->getCellsHeight() * game_board->getCellsWidth());
 
@@ -176,48 +180,6 @@ std::vector<std::vector<int>> BFS_Algorithm::CreateAdjacencyMatrix(const int& to
 
 	return result;
 
-	/*
-
-	std::vector<std::vector<int>> result;
-
-	int current_adjacency_value_start = (adjacency_one_dimension_length / total_number_threads) * thread_number;
-	int current_adjacency_value_finish = (adjacency_one_dimension_length / total_number_threads) * (thread_number + 1);
-
-	for (int current_adjacency_value = current_adjacency_value_start; 
- 		     current_adjacency_value < current_adjacency_value_finish; 
-			 current_adjacency_value++) 
-	{
-		std::vector<int> temp_adjacency_values(adjacency_one_dimension_length, 0);
-
-		// If it's not the on the left side, add the one to the left of it
-		if (current_adjacency_value % cells_width != 0)
-			temp_adjacency_values.at(current_adjacency_value - 1) = 1;
-
-		// If it's not on the right side, add the one to the right of it
-		if ((current_adjacency_value + 1) % cells_width != 0)
-			temp_adjacency_values.at(current_adjacency_value + 1) = 1;
-
-		// If it's not on the top row, add the one above it
-		if (current_adjacency_value >= cells_width)
-			temp_adjacency_values.at(current_adjacency_value - cells_width) = 1;
-
-		// If it's not on the bottom row, add the one below it
-		if (current_adjacency_value < ((game_board->getCellsHeight() - 1) * cells_width))
-			temp_adjacency_values.at(current_adjacency_value + cells_width) = 1;
-		
-		result.push_back(temp_adjacency_values);
-	}
-
-	return result;
-
-	
-	*/
-	
-		
-	/*
-	
-	*/
-	
 }
 
 
@@ -270,6 +232,7 @@ std::vector<Edge> BFS_Algorithm::GetAdjacentEdges(int& adjacency_value, std::vec
 		}
 	}
 	
+	return adjacent_edges;
 }
 
 std::vector<Edge> BFS_Algorithm::GetAdjacentEdgesOld(int& adjacency_value, std::vector<Edge>& visted) {

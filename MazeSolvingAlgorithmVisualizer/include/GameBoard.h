@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "SDL.h"
+#include <map>
 
 enum CELL_TYPE {
 	NORMAL_PATH,
@@ -20,7 +21,7 @@ public:
 			  int screen_h_px);
 
 	void InitializeGameBoard();
-
+	
 	void DisplayRenderer();
 	void DrawButDontDisplayCell(int row, int col, SDL_Color color);
 	void DrawGameBoard();
@@ -72,4 +73,5 @@ private:
 	int finish_col_position;
 
 	int line_between_cells_offset_px = 1;
+
 };

@@ -2,8 +2,6 @@
 #include <vector>
 #include <deque>
 #include <map>
-#include <utility>
-
 #include "SDL.h"
 #include "Edge.h"
 
