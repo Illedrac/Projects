@@ -3,9 +3,9 @@
 #include "SDL.h"
 #include "GameBoard.h"
 #include "Button.h"
-#include "BFS_Algorithm.h"
 #include "SDL_image.h"
 #include "MazeGenerator.h"
+#include "Search_Algorithm_Factory.h"
 
 enum DRAW_TYPE {
 	DRAW_MAZE,
@@ -13,7 +13,7 @@ enum DRAW_TYPE {
 	DRAW_FINISH
 };
 
-// I don't really know how buttons shouuld work in SDL2 so I just create button instances that hold a texture and 
+// I don't really know how buttons should work in SDL2 so I just create button instances that hold a texture and 
 // to check if a user clicks the button I just check x and y values of the mouse click. Not very good but the UI is not the
 // focus of this project 
 void CreateButtons(SDL_Renderer* renderer, std::vector<Button>& buttons, DRAW_TYPE current_draw_type) {
@@ -116,8 +116,15 @@ void GameLoop() {
 	DrawButtons(renderer, buttons);
 
 	GameBoard board(window, renderer, number_cells_width, number_cells_height, screen_width_px - 160, screen_height_px - 50);
+	
 	MazeGenerator maze_generator(&board);
 
+	SEARCH_ALGORITHM_TYPE searchType = SEARCH_ALGORITHM_TYPE::DFS;
+
+	Search_Algorithm_Factory factory(&board);
+
+	Search_Algorithm* search_algorithm_implementation = factory.CreateAlgorithmImplementation(searchType);
+	
 	bool continue_running_program = SDL_TRUE;
 	bool mouse_button_held = false;
 	bool finish_already_drawn = false;
@@ -142,8 +149,6 @@ void GameLoop() {
 	
 	int mouse_x, mouse_y;
 
-	BFS_Algorithm BFS(&board);
-
 	while (continue_running_program) {
 		if(board.update_made)
 			board.DrawGameBoard();
@@ -163,7 +168,7 @@ void GameLoop() {
 					DrawButtonForAMoment(renderer, buttons.at(0));
 					
 					if (board.readyToStartSearch())
-						continue_running_program = BFS.BeginSearch();
+						continue_running_program = search_algorithm_implementation->BeginSearch();
 					
 					break;
 				
@@ -200,12 +205,25 @@ void GameLoop() {
 				case SDL_SCANCODE_R:
 				
 					DrawButtonForAMoment(renderer, buttons.at(5));
+
 					SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
 					SDL_RenderClear(renderer);
+
+					UnselectButton(selected_button, buttons);
+
+					selected_button = BUTTON_TYPE::BUTTON_MAZE;
+					current_draw_type = DRAW_TYPE::DRAW_MAZE;
+					buttons.at(3).setSelected(true);
 					DrawButtons(renderer, buttons);
+
 					board.ClearBoard();
-					BFS.ClearBoard();
-					
+					search_algorithm_implementation->ClearBoard();
+
+					for (Button& b : buttons) {
+						b.setSelected(false);
+					}
+
 					// Instead of having booleans for these we could just check if the boards stored finish & start positions are -1, -1
 					finish_already_drawn = false;
 					start_already_drawn = false;
@@ -334,7 +352,7 @@ void GameLoop() {
 									DrawButtonForAMoment(renderer, b);
 									
 									if(board.readyToStartSearch())
-										continue_running_program = BFS.BeginSearch();
+										continue_running_program = search_algorithm_implementation->BeginSearch();
 									break;
 
 								case BUTTON_TYPE::BUTTON_START:
@@ -379,10 +397,18 @@ void GameLoop() {
 									DrawButtonForAMoment(renderer, b);
 
 									SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
 									SDL_RenderClear(renderer);
+									
+									UnselectButton(selected_button, buttons);
+
+									selected_button = BUTTON_TYPE::BUTTON_MAZE;
+									current_draw_type = DRAW_TYPE::DRAW_MAZE;
+									buttons.at(3).setSelected(true);
 									DrawButtons(renderer, buttons);
+
 									board.ClearBoard();
-									BFS.ClearBoard();
+									search_algorithm_implementation->ClearBoard();
 
 									for (Button& b : buttons) {
 										b.setSelected(false);
