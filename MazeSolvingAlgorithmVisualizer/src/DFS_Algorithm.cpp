@@ -32,8 +32,10 @@ bool DFS_Algorithm::Search(int row, int col) {
 		SDL_PollEvent(&event);
 
 		switch (event.type) {
-		case SDL_KEYDOWN:
-			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+			case SDL_KEYDOWN:
+				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+					return false;
+			case SDL_QUIT:
 				return false;
 		}
 
@@ -55,12 +57,14 @@ bool DFS_Algorithm::Search(int row, int col) {
 			game_board->DrawButDontDisplayCell(node.getRow(), node.getCol(), color);
 
 			game_board->DisplayRenderer();
-
 		}
 
 		int adjacency_value = (game_board->getCellsWidth() * node.getRow()) + node.getCol();
 
 		std::vector<Edge> adjacent_edges = GetAdjacentEdges(adjacency_value);
+		
+		if (adjacent_edges.size() > 1)
+			ReorderAdjacentEdges(node, adjacent_edges);
 
 		for (int i = 0; i < adjacent_edges.size(); i++) {
 
@@ -88,4 +92,57 @@ bool DFS_Algorithm::Search(int row, int col) {
 
 }
 
+// According to https://www.youtube.com/watch?v=GC-nBgi9r0U&t=241s
+// The order of precedence for DFS ( at least his implementation ) is Up, Right, Down, Left
+// Since we're using a stack, we want to push elements up in that order, just reversed
+// Thus, reorganize the adjacency matrix such that the adjacent nodes are in the order of 
+// Left, Down, Right, Up
+void DFS_Algorithm::ReorderAdjacentEdges(Edge& node, std::vector<Edge>& adjacent_edges) {
 
+	
+	for (int i = 0; i < adjacent_edges.size(); i++) {
+		
+		Edge& cur_edge = adjacent_edges.at(i);
+
+		int index_to_swap = -1;
+
+		std::vector<int> current_precedence_value = { cur_edge.getRow() - node.getRow(), cur_edge.getCol() - node.getCol()};
+		
+		int highest_precedence_index = getDirectionPrecedence(current_precedence_value);
+
+		for (int j = i + 1; j < adjacent_edges.size(); j++) {
+
+			Edge& edge_to_compare_against = adjacent_edges.at(j);
+			
+			std::vector<int> comparison_precedence_value{ edge_to_compare_against.getRow() - node.getRow(),
+														  edge_to_compare_against.getCol() - node.getCol() };
+
+			int comparison_precedence_index = getDirectionPrecedence(comparison_precedence_value);
+
+			if (comparison_precedence_index < highest_precedence_index) {
+				highest_precedence_index = comparison_precedence_index;
+				index_to_swap = j;
+			}
+
+		}
+
+		if(index_to_swap != -1)
+			std::swap(adjacent_edges.at(i), adjacent_edges.at(index_to_swap));
+	}
+	int x = 10;
+}
+
+
+int DFS_Algorithm::getDirectionPrecedence(std::vector<int>& current_precedence_value) {
+
+	for (int i = 0; i < number_possible_neighbors; i++) {
+		if (current_precedence_value.at(0) == direction_precedence[i][0] &&
+			current_precedence_value.at(1) == direction_precedence[i][1])
+		{
+			return i;
+		}
+	}
+
+	return -1;
+
+}

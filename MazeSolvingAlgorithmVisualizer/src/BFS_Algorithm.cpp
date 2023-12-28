@@ -34,6 +34,8 @@ bool BFS_Algorithm::Search(int row, int col)
 			case SDL_KEYDOWN:
 				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 					return false;
+			case SDL_QUIT:
+				return false;
 		}
 
 		Edge node = queue.front();
