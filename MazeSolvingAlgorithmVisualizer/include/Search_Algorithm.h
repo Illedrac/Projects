@@ -37,7 +37,7 @@ protected:
 	inline std::vector<Edge> getVisited() { return visited; }
 
 	void DrawFinishedPath(const int& row, const int& col);
-
+	bool CheckSDLEvents();
 
 	GameBoard* game_board;
 	bool found_finish;

@@ -2,25 +2,25 @@
 #include <random>
 #include <ctime>
 
-GameBoard::GameBoard(SDL_Window* window,
-	SDL_Renderer* renderer,
-	int num_cells_width,
-	int num_cells_height,
-	int screen_w_px,
-	int screen_h_px) :
-	update_made(true),
-	window(window),
-	renderer(renderer),
-	screen_width_px(screen_w_px),
-	screen_height_px(screen_h_px),
-	number_cells_width(num_cells_width),
-	number_cells_height(num_cells_height),
-	cell_width_px(screen_width_px / num_cells_width),
-	cell_height_px(screen_height_px / num_cells_height),
-	start_row_position(-1),
-	start_col_position(-1),
-	finish_row_position(-1),
-	finish_col_position(-1)
+GameBoard::GameBoard(std::shared_ptr<SDL_Window> window,
+					 std::shared_ptr<SDL_Renderer> renderer,
+					 int num_cells_width,
+					 int num_cells_height,
+					 int screen_w_px,
+					 int screen_h_px) :
+					 update_made(true),
+					 window(window),
+					 renderer(renderer),
+					 screen_width_px(screen_w_px),
+					 screen_height_px(screen_h_px),
+					 number_cells_width(num_cells_width),
+					 number_cells_height(num_cells_height),
+					 cell_width_px(screen_width_px / num_cells_width),
+					 cell_height_px(screen_height_px / num_cells_height),
+					 start_row_position(-1),
+					 start_col_position(-1),
+					 finish_row_position(-1),
+					 finish_col_position(-1)
 {
 	InitializeGameBoard();
 }
@@ -37,7 +37,7 @@ void GameBoard::InitializeGameBoard() {
 	}
 
 	// MOVED THIS OUTSIDE FOR LOOP
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer.get(), 255, 255, 255, 255);
 
 	SDL_Rect rect;
 	rect.x = 1;
@@ -45,13 +45,13 @@ void GameBoard::InitializeGameBoard() {
 	rect.w = (screen_width_px );// *number_cells_width + 1;
 	rect.h = (screen_height_px);// *number_cells_height + 1;
 
-	SDL_RenderDrawRect(renderer, &rect);
-	SDL_RenderPresent(renderer);
+	SDL_RenderDrawRect(renderer.get(), &rect);
+	SDL_RenderPresent(renderer.get());
 }
 
 void GameBoard::DrawButDontDisplayCell(int row, int col, SDL_Color color) {
 
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_SetRenderDrawColor(renderer.get(), color.r, color.g, color.b, color.a);
 
 	SDL_Rect cur_rect;
 	cur_rect.x = cell_width_px * col + line_between_cells_offset_px;
@@ -59,11 +59,11 @@ void GameBoard::DrawButDontDisplayCell(int row, int col, SDL_Color color) {
 	cur_rect.w = cell_width_px - line_between_cells_offset_px;
 	cur_rect.h = cell_height_px - line_between_cells_offset_px;
 
-	SDL_RenderFillRect(renderer, &cur_rect);
+	SDL_RenderFillRect(renderer.get(), &cur_rect);
 }
 
 void GameBoard::DisplayRenderer() {
-	SDL_RenderPresent(renderer);
+	SDL_RenderPresent(renderer.get());
 }
 
 
@@ -106,7 +106,7 @@ void GameBoard::DrawGameBoard() {
 				}
 
 
-				SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+				SDL_SetRenderDrawColor(renderer.get(), c.r, c.g, c.b, c.a);
 
 				SDL_Rect cur_rect;
 				cur_rect.x = cell_width_px * col + line_between_cells_offset_px;
@@ -114,48 +114,16 @@ void GameBoard::DrawGameBoard() {
 				cur_rect.w = cell_width_px - line_between_cells_offset_px;
 				cur_rect.h = cell_height_px - line_between_cells_offset_px;
 
-				SDL_RenderFillRect(renderer, &cur_rect);
+				SDL_RenderFillRect(renderer.get(), &cur_rect);
 			}
 
 		}
 
-		SDL_RenderPresent(renderer);
+		SDL_RenderPresent(renderer.get());
 
 		update_made = false;
 	}
 }
-
-void GameBoard::generateUniformRandNoise() {
-	
-	std::default_random_engine generator(std::time(nullptr));
-	std::uniform_int_distribution<int> row_dist(0, number_cells_height - 1);
-	std::uniform_int_distribution<int> col_dist(0, number_cells_width - 1);
-
-	int arbitrary_number_walls_generated = 1000 ;
-
-	for (int i = 0; i < arbitrary_number_walls_generated; i++) {
-		
-		int row = row_dist(generator);
-		int col = col_dist(generator);
-
-		// This is unsafe as the more walls you have, the longer the loop
-		// Eventually leading to an infinite loop. I'm acting under the assumption that 
-		// normal use of this program won't have all walls filled in -- oops
-		while (gameBoard.at(row).at(col) != CELL_TYPE::NORMAL_PATH) {
-			row = row_dist(generator);
-			col = col_dist(generator);
-		}
-
-		gameBoard.at(row).at(col) = CELL_TYPE::WALL;
-
-	}
-
-	update_made = true;
-
-	DrawGameBoard();
-	
-}
-
 
 void GameBoard::setStartPosition(int row, int col) {
 	start_row_position = row;

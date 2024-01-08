@@ -10,9 +10,6 @@ class MazeGenerator
 public:
     MazeGenerator(GameBoard* gb);
 
-    bool isValid(int row, int col);
-    void addWallsToList(int row, int col, std::queue<std::pair<int, int>>& walls);
-    //void recursiveBacktrack(int row, int col);
     void generate();
 
 private:

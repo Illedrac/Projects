@@ -25,19 +25,10 @@ bool DFS_Algorithm::Search(int row, int col) {
 
 	game_board->DisplayRenderer();
 
-	SDL_Event event;
-
 	while (!stack.empty()) {
 
-		SDL_PollEvent(&event);
-
-		switch (event.type) {
-			case SDL_KEYDOWN:
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-					return false;
-			case SDL_QUIT:
-				return false;
-		}
+		if ( !CheckSDLEvents() )
+			return false;
 
 		Edge node = stack.top();
 		stack.pop();

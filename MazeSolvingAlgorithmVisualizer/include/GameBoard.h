@@ -2,6 +2,7 @@
 #include <vector>
 #include "SDL.h"
 #include <map>
+#include <memory>
 
 enum CELL_TYPE {
 	NORMAL_PATH,
@@ -13,8 +14,8 @@ enum CELL_TYPE {
 class GameBoard {
 
 public:
-	GameBoard(SDL_Window* window, 
-			  SDL_Renderer* renderer,
+	GameBoard(std::shared_ptr<SDL_Window> window,
+			  std::shared_ptr<SDL_Renderer> renderer,
 			  int num_cells_width, 
 			  int num_cells_height, 
 			  int screen_w_px, 
@@ -25,7 +26,6 @@ public:
 	void DisplayRenderer();
 	void DrawButDontDisplayCell(int row, int col, SDL_Color color);
 	void DrawGameBoard();
-	void generateUniformRandNoise();
 	void setStartPosition(int row, int col);
 	void setFinishPosition(int row, int col);
 	void ClearBoard();
@@ -55,8 +55,8 @@ public:
 	bool update_made;
 
 private:
-	SDL_Window* window;
-	SDL_Renderer* renderer;
+	std::shared_ptr<SDL_Window> window;
+	std::shared_ptr<SDL_Renderer> renderer;
 
 	int screen_width_px;
 	int screen_height_px;

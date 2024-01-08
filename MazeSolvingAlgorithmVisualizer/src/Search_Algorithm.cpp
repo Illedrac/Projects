@@ -206,3 +206,21 @@ void Search_Algorithm::DrawFinishedPath(const int& row, const int& col) {
 		SDL_Delay(1);
 	}
 }
+
+
+bool Search_Algorithm::CheckSDLEvents() {
+
+	SDL_Event event;
+
+	SDL_PollEvent(&event);
+
+	switch (event.type) {
+		case SDL_KEYDOWN:
+			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+				return false;
+		case SDL_QUIT:
+			return false;
+	}
+
+	return true;
+}
