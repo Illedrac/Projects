@@ -2,11 +2,15 @@
 #include "BFS_Algorithm.h"
 #include "DFS_Algorithm.h"
 
+Search_Algorithm_Factory::Search_Algorithm_Factory()
+	: game_board()
+{}
+
 Search_Algorithm_Factory::Search_Algorithm_Factory(GameBoard* gb)
 	: game_board(gb)
 {}
 
-Search_Algorithm* Search_Algorithm_Factory::CreateAlgorithmImplementation(SEARCH_ALGORITHM_TYPE& type) {
+Search_Algorithm* Search_Algorithm_Factory::CreateAlgorithmImplementation(const SEARCH_ALGORITHM_TYPE& type) {
 	switch (type) {
 		case SEARCH_ALGORITHM_TYPE::BFS:
 			return new BFS_Algorithm(game_board);

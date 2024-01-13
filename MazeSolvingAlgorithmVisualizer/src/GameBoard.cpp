@@ -2,25 +2,43 @@
 #include <random>
 #include <ctime>
 
-GameBoard::GameBoard(std::shared_ptr<SDL_Window> window,
-					 std::shared_ptr<SDL_Renderer> renderer,
+GameBoard::GameBoard() :
+	update_made(false),
+	window(),
+	renderer(),
+	screen_width_px(-1),
+	screen_height_px(-1),
+	number_cells_width(-1),
+	number_cells_height(-1),
+	cell_width_px(-1),
+	cell_height_px(-1),
+	start_row_position(-1),
+	start_col_position(-1),
+	finish_row_position(-1),
+	finish_col_position(-1)
+{}
+
+GameBoard::GameBoard(SDL_Window* window,
+					 SDL_Renderer* renderer,
 					 int num_cells_width,
 					 int num_cells_height,
 					 int screen_w_px,
 					 int screen_h_px) :
-					 update_made(true),
-					 window(window),
-					 renderer(renderer),
-					 screen_width_px(screen_w_px),
-					 screen_height_px(screen_h_px),
-					 number_cells_width(num_cells_width),
-					 number_cells_height(num_cells_height),
-					 cell_width_px(screen_width_px / num_cells_width),
-					 cell_height_px(screen_height_px / num_cells_height),
-					 start_row_position(-1),
-					 start_col_position(-1),
-					 finish_row_position(-1),
-					 finish_col_position(-1)
+
+	update_made(true),
+	window(window),
+	renderer(renderer),
+	screen_width_px(screen_w_px),
+	screen_height_px(screen_h_px),
+	number_cells_width(num_cells_width),
+	number_cells_height(num_cells_height),
+	cell_width_px(screen_width_px / num_cells_width),
+	cell_height_px(screen_height_px / num_cells_height),
+	start_row_position(-1),
+	start_col_position(-1),
+	finish_row_position(-1),
+	finish_col_position(-1)
+
 {
 	InitializeGameBoard();
 }
@@ -37,7 +55,7 @@ void GameBoard::InitializeGameBoard() {
 	}
 
 	// MOVED THIS OUTSIDE FOR LOOP
-	SDL_SetRenderDrawColor(renderer.get(), 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
 	SDL_Rect rect;
 	rect.x = 1;
@@ -45,13 +63,13 @@ void GameBoard::InitializeGameBoard() {
 	rect.w = (screen_width_px );// *number_cells_width + 1;
 	rect.h = (screen_height_px);// *number_cells_height + 1;
 
-	SDL_RenderDrawRect(renderer.get(), &rect);
-	SDL_RenderPresent(renderer.get());
+	SDL_RenderDrawRect(renderer, &rect);
+	SDL_RenderPresent(renderer);
 }
 
 void GameBoard::DrawButDontDisplayCell(int row, int col, SDL_Color color) {
 
-	SDL_SetRenderDrawColor(renderer.get(), color.r, color.g, color.b, color.a);
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
 	SDL_Rect cur_rect;
 	cur_rect.x = cell_width_px * col + line_between_cells_offset_px;
@@ -59,11 +77,11 @@ void GameBoard::DrawButDontDisplayCell(int row, int col, SDL_Color color) {
 	cur_rect.w = cell_width_px - line_between_cells_offset_px;
 	cur_rect.h = cell_height_px - line_between_cells_offset_px;
 
-	SDL_RenderFillRect(renderer.get(), &cur_rect);
+	SDL_RenderFillRect(renderer, &cur_rect);
 }
 
 void GameBoard::DisplayRenderer() {
-	SDL_RenderPresent(renderer.get());
+	SDL_RenderPresent(renderer);
 }
 
 
@@ -77,6 +95,7 @@ void GameBoard::DrawGameBoard() {
 			for (int col = 0; col < number_cells_width; col++) {
 		
 				SDL_Color c;
+
 
 				switch (gameBoard.at(row).at(col)) {
 					case CELL_TYPE::NORMAL_PATH:
@@ -106,7 +125,7 @@ void GameBoard::DrawGameBoard() {
 				}
 
 
-				SDL_SetRenderDrawColor(renderer.get(), c.r, c.g, c.b, c.a);
+				SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
 
 				SDL_Rect cur_rect;
 				cur_rect.x = cell_width_px * col + line_between_cells_offset_px;
@@ -114,12 +133,12 @@ void GameBoard::DrawGameBoard() {
 				cur_rect.w = cell_width_px - line_between_cells_offset_px;
 				cur_rect.h = cell_height_px - line_between_cells_offset_px;
 
-				SDL_RenderFillRect(renderer.get(), &cur_rect);
+				SDL_RenderFillRect(renderer, &cur_rect);
 			}
 
 		}
 
-		SDL_RenderPresent(renderer.get());
+		SDL_RenderPresent(renderer);
 
 		update_made = false;
 	}

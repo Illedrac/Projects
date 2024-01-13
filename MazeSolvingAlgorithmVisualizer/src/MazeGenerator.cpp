@@ -2,8 +2,17 @@
 #include <random>
 #include <stack>
 
+MazeGenerator::MazeGenerator()
+    : game_board(), 
+      rows(-1), 
+      cols(-1)
+{
+}
+
 MazeGenerator::MazeGenerator(GameBoard* gb)
-    : game_board(gb), rows(gb->getCellsHeight()), cols(gb->getCellsWidth())
+    : game_board(gb), 
+      rows(gb->getCellsHeight()), 
+      cols(gb->getCellsWidth())
 {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 }

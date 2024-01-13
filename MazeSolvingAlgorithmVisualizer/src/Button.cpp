@@ -26,7 +26,7 @@ Button::Button(SDL_Renderer* renderer, std::string image_name, std::string base_
 	unselected_texture = SDL_CreateTextureFromSurface(renderer, unselected_image);
 	selected_texture = SDL_CreateTextureFromSurface(renderer, selected_image);
 
-	rect.x = 1755;
+	rect.x = 1756;
 	rect.y = y;
 	rect.w = 150;
 	rect.h = 150;

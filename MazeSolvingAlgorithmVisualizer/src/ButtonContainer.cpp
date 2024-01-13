@@ -1,22 +1,52 @@
 #include "ButtonContainer.h"
 
 
-ButtonContainer::ButtonContainer(std::shared_ptr<SDL_Renderer> renderer) :	
+ButtonContainer::ButtonContainer() :
+	button_vector(),
+	base_project_path(SDL_GetBasePath()),
+	default_draw_button_type(BUTTON_TYPE::BUTTON_MAZE),
+	default_algorithm_button_type(BUTTON_TYPE::BUTTON_BFS)
+{}
+
+ButtonContainer::ButtonContainer(SDL_Renderer* renderer) :	
 		button_vector(),
 		base_project_path(SDL_GetBasePath()),
-		default_button_type(BUTTON_TYPE::BUTTON_MAZE)
+		default_draw_button_type(BUTTON_TYPE::BUTTON_MAZE),
+		default_algorithm_button_type(BUTTON_TYPE::BUTTON_BFS)
 {
 	CreateButtons(renderer);
 	DrawButtons(renderer);
 }
 
 
-void ButtonContainer::DrawButtons(std::shared_ptr<SDL_Renderer> renderer) {
+void ButtonContainer::DrawButtons(SDL_Renderer* renderer) {
 
-	for (Button b : button_vector) {
-		SDL_RenderCopy(renderer.get(), b.getTexture(), NULL, &b.getRect());
+	// This is bad, I know, 
+	SDL_Rect rect;
+	rect.x = 1920 - 170;
+	rect.y = 0;
+	rect.h = 1080 - 89;
+	rect.w = 160;
+
+	SDL_SetRenderDrawColor(renderer, 167, 167, 167, 255);
+	SDL_RenderFillRect(renderer, &rect);
+
+	rect.x = 1920 - 165;
+	rect.y = 65;
+	rect.h = 1080 - 230;
+	rect.w = 150;
+	
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(renderer, &rect);
+
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	
+	for (Button& b : button_vector) {
+		SDL_RenderCopy(renderer, b.getTexture(), NULL, &b.getRect());
 	}
 
+	SDL_RenderPresent(renderer);
 }
 
 int ButtonContainer::GetButtonByButtonType(const BUTTON_TYPE& button_type) {
@@ -36,65 +66,63 @@ void ButtonContainer::UnselectButton(const BUTTON_TYPE& type) {
 }
 
 
-void ButtonContainer::DrawButtonForAMoment(std::shared_ptr<SDL_Renderer> renderer, const BUTTON_TYPE& type){//Button& b) {
+void ButtonContainer::DrawButtonForAMoment(SDL_Renderer* renderer, const BUTTON_TYPE& type){//Button& b) {
 	
 	Button& current_button = button_vector.at(GetButtonByButtonType(type));
 
 	current_button.setSelected(true);
-	SDL_RenderCopy(renderer.get(), current_button.getTexture(), NULL, &current_button.getRect());
-	SDL_RenderPresent(renderer.get());
+	SDL_RenderCopy(renderer, current_button.getTexture(), NULL, &current_button.getRect());
+	SDL_RenderPresent(renderer);
 	SDL_Delay(75);
 	
 	current_button.setSelected(false);
-	SDL_RenderCopy(renderer.get(), current_button.getTexture(), NULL, &current_button.getRect());
-	SDL_RenderPresent(renderer.get());
+	SDL_RenderCopy(renderer, current_button.getTexture(), NULL, &current_button.getRect());
+	SDL_RenderPresent(renderer);
 }
 
-void ButtonContainer::ButtonPressed(std::shared_ptr<SDL_Renderer> renderer, BUTTON_TYPE& current_button_type, const BUTTON_TYPE& button_type_to_be_selected/*DRAW_TYPE& current_draw_type,*/) {
-	
+void ButtonContainer::ButtonPressed(SDL_Renderer* renderer, BUTTON_TYPE& current_button_type, const BUTTON_TYPE& button_type_to_be_selected) {
 	
 	UnselectButton(current_button_type);
 
 	current_button_type = button_type_to_be_selected;
 	
 	button_vector.at(GetButtonByButtonType(current_button_type)).setSelected(true);
-	
+
 	DrawButtons(renderer);
 	
-	SDL_RenderPresent(renderer.get());
 
 }
 
 // I don't really know how buttons should work in SDL2 so I just create button instances that hold a texture and 
 // to check if a user clicks the button I just check x and y values of the mouse click. Not very good but the UI is not the
 // focus of this project 
-void ButtonContainer::CreateButtons(std::shared_ptr<SDL_Renderer> renderer /*DRAW_TYPE current_draw_type*/) {
+void ButtonContainer::CreateButtons(SDL_Renderer* renderer /*DRAW_TYPE current_draw_type*/) {
 
-	Button Search_button(renderer.get(), "Search_button", base_project_path, 10, BUTTON_TYPE::BUTTON_SEARCH);
-	Button Start_button(renderer.get(), "Start_button", base_project_path, 120, BUTTON_TYPE::BUTTON_START);
-	Button Finish_button(renderer.get(), "Finish_button", base_project_path, 230, BUTTON_TYPE::BUTTON_FINISH);
-	Button Maze_button(renderer.get(), "Maze_button", base_project_path, 340, BUTTON_TYPE::BUTTON_MAZE);
-	Button Add_Walls_button(renderer.get(), "Add_Walls_button", base_project_path, 450, BUTTON_TYPE::BUTTON_ADD_WALLS);
-	Button Reset_button(renderer.get(), "Reset_button", base_project_path, 560, BUTTON_TYPE::BUTTON_RESET);
+	int num_buttons = 8;
 
-	button_vector.push_back(Search_button);
-	button_vector.push_back(Start_button);
-	button_vector.push_back(Finish_button);
-	button_vector.push_back(Maze_button);
-	button_vector.push_back(Add_Walls_button);
-	button_vector.push_back(Reset_button);
-
-	button_vector.at(GetButtonByButtonType(default_button_type)).setSelected(true);
-
+	const std::vector<std::string> button_strings_in_order = { "Start", "Finish", "Maze", "Add_Walls", "BFS", "DFS", "Search", "Reset" };
+	const std::vector<BUTTON_TYPE> button_types_in_order = { BUTTON_START, BUTTON_FINISH, BUTTON_MAZE, BUTTON_ADD_WALLS, BUTTON_BFS, BUTTON_DFS, BUTTON_SEARCH, BUTTON_RESET };
+	
+	for (int i = 0; i < num_buttons; i++) {
+		Button current_button(renderer, button_strings_in_order.at(i) + "_button", base_project_path, (30 + 110 * i), button_types_in_order.at(i));
+		button_vector.push_back(current_button);
+	}
+	
+	button_vector.at(GetButtonByButtonType(default_draw_button_type)).setSelected(true);
+	button_vector.at(GetButtonByButtonType(BUTTON_TYPE::BUTTON_BFS)).setSelected(true);
 }
 
-void ButtonContainer::ClearButtons(std::shared_ptr<SDL_Renderer> renderer, BUTTON_TYPE& current_button_type){
+void ButtonContainer::ClearButtons(SDL_Renderer* renderer, BUTTON_TYPE& current_button_type){
+	
 	UnselectButton(current_button_type);
 
-	current_button_type = default_button_type;
-	//current_draw_type = DRAW_TYPE::DRAW_MAZE;
+	current_button_type = default_draw_button_type;
+
 	
 	button_vector.at(GetButtonByButtonType(current_button_type)).setSelected(true);
+	button_vector.at(GetButtonByButtonType(default_algorithm_button_type)).setSelected(true);
+
+	
 	DrawButtons(renderer);
 
 	

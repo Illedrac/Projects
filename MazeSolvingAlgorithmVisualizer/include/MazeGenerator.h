@@ -8,6 +8,9 @@ class MazeGenerator
 {
 
 public:
+
+    MazeGenerator();
+
     MazeGenerator(GameBoard* gb);
 
     void generate();

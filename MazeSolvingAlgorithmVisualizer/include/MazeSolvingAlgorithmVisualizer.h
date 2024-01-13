@@ -20,12 +20,15 @@ public:
 
 
 private:
-	SDL_Renderer* r;
-	SDL_Window* w;
+	const int screen_width_px = 1910;
+	const int screen_height_px = 1040;
+	const int number_cells_width = 175;
+	const int number_cells_height = 198;
 
-	std::shared_ptr<SDL_Renderer> renderer;
-	std::shared_ptr<SDL_Window> window;
+	SDL_Window* window;
 
+	SDL_Renderer* renderer;
+	
 	ButtonContainer button_container;
 
 	GameBoard board;
@@ -37,12 +40,6 @@ private:
 	Search_Algorithm_Factory factory;
 
 	Search_Algorithm* search_algorithm_implementation;
-
-
-	const int screen_width_px = 1910;
-	const int screen_height_px = 1040;
-	const int number_cells_width = 175;
-	const int number_cells_height = 198;
 
 	DRAW_TYPE current_draw_type = DRAW_MAZE;
 

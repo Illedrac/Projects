@@ -14,8 +14,11 @@ enum CELL_TYPE {
 class GameBoard {
 
 public:
-	GameBoard(std::shared_ptr<SDL_Window> window,
-			  std::shared_ptr<SDL_Renderer> renderer,
+
+	GameBoard();
+
+	GameBoard(SDL_Window* window,
+			  SDL_Renderer* renderer,
 			  int num_cells_width, 
 			  int num_cells_height, 
 			  int screen_w_px, 
@@ -55,8 +58,8 @@ public:
 	bool update_made;
 
 private:
-	std::shared_ptr<SDL_Window> window;
-	std::shared_ptr<SDL_Renderer> renderer;
+	SDL_Window* window;
+	SDL_Renderer* renderer;
 
 	int screen_width_px;
 	int screen_height_px;
