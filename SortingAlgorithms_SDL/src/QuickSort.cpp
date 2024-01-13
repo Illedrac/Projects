@@ -47,7 +47,7 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
             DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 0, 255, 0, 255 });
 
             SDL_RenderPresent(renderer);
-            //SDL_Delay(10);
+            SDL_Delay(2);
 
             std::swap(unsortedNumbersArray->at(i), unsortedNumbersArray->at(j));
             
@@ -58,7 +58,7 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
             DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 255, 0, 0, 255 });
 
             SDL_RenderPresent(renderer);
-            //SDL_Delay(10);
+            SDL_Delay(2);
 
             ClearCurrentArrayAtIndex(window, renderer, j, screen_width);
             ClearCurrentArrayAtIndex(window, renderer, i, screen_width);
@@ -67,7 +67,7 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
             DrawCurrentArrayAtIndex(window, renderer, i, screen_width, SDL_Color{ 255, 255, 255, 255 });
             
             SDL_RenderPresent(renderer);
-            //SDL_Delay(10);
+            SDL_Delay(2);
         }
     }
     DrawCurrentArrayAtIndex(window, renderer, high, screen_width, SDL_Color{ 255, 255, 255, 255 });
@@ -81,7 +81,7 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
     DrawCurrentArrayAtIndex(window, renderer, high , screen_width, SDL_Color{ 0, 255, 0, 255 });
 
     SDL_RenderPresent(renderer);
-    //SDL_Delay(10);
+    SDL_Delay(2);
 
     std::swap(unsortedNumbersArray->at(i + 1), unsortedNumbersArray->at(high));
 
@@ -92,7 +92,7 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
     DrawCurrentArrayAtIndex(window, renderer, high, screen_width, SDL_Color{ 255, 0, 0, 255 });
 
     SDL_RenderPresent(renderer);
-    SDL_Delay(15);
+    SDL_Delay(2);
 
     ClearCurrentArrayAtIndex(window, renderer, i + 1, screen_width);
     ClearCurrentArrayAtIndex(window, renderer, high, screen_width);
@@ -101,7 +101,7 @@ int QuickSort::Partition(SDL_Window* window, SDL_Renderer* renderer, int low, in
     DrawCurrentArrayAtIndex(window, renderer, high, screen_width, SDL_Color{ 255, 255, 255, 255 });
 
     SDL_RenderPresent(renderer);
-    SDL_Delay(15);
+    SDL_Delay(2);
     
     return (i + 1);
 }
