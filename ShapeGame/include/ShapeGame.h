@@ -11,6 +11,8 @@ public:
 	void GameLoop();
 	void MoveTriangle();
 	void RotateTriangle();
+	void SutherlandHodgmanAreaCalculation();
+
 
 	inline float PI() { return 4 * std::atan(1); }
 

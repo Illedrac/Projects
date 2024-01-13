@@ -1,5 +1,6 @@
 #include "SDL.h"
 #include <utility>
+#include <span>
 #include "ShapeGame.h"
 
 
@@ -195,4 +196,53 @@ void ShapeGame::RotateTriangle() {
 
 	rotation_x += move_velocity;
 
+}
+
+void ShapeGame::SutherlandHodgmanAreaCalculation() {
+
+	std::vector<SDL_Vertex> result;
+
+
+
+
+	/*
+	std::span<vec2 const> subject_polygon, std::span<vec2 const> clip_polygon) {
+		if (clip_polygon.empty() || subject_polygon.empty()) {
+			return {};
+		}
+
+		std::vector<vec2> ring{ subject_polygon.begin(), subject_polygon.end() };
+
+		vec2 p1 = clip_polygon[clip_polygon.size() - 1];
+
+		std::vector<vec2> input;
+
+		for (vec2 p2 : clip_polygon) {
+			input.clear();
+			input.insert(input.end(), ring.begin(), ring.end());
+			vec2 s = input[input.size() - 1];
+
+			ring.clear();
+
+			for (vec2 e : input) {
+				if (is_inside(e, p1, p2)) {
+					if (!is_inside(s, p1, p2)) {
+						ring.push_back(intersection(p1, p2, s, e));
+					}
+
+					ring.push_back(e);
+				}
+				else if (is_inside(s, p1, p2)) {
+					ring.push_back(intersection(p1, p2, s, e));
+				}
+
+				s = e;
+			}
+
+			p1 = p2;
+		}
+
+		return ring;
+
+		*/
 }
