@@ -88,7 +88,7 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 
 						button_container.DrawButtonForAMoment(renderer, BUTTON_TYPE::BUTTON_SEARCH);
 
-						if (board.readyToStartSearch())
+						if (board.readyToStartSearch() && !search_algorithm_implementation->FoundFinish())
 							continue_running_program = search_algorithm_implementation->BeginSearch();
 
 						break;
@@ -305,14 +305,14 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 							if (mouse_x >= rect.x && mouse_x <= (rect.x + rect.w) && mouse_y >= rect.y && mouse_y <= (rect.y + rect.h)) {
 
 								switch (b.getButtonType()) {
+
 									case BUTTON_TYPE::BUTTON_SEARCH:{
 
 										button_container.DrawButtonForAMoment(renderer, BUTTON_TYPE::BUTTON_SEARCH);
 
-										if (board.readyToStartSearch())
+										if (board.readyToStartSearch() && !search_algorithm_implementation->FoundFinish())
 											continue_running_program = search_algorithm_implementation->BeginSearch();
-										
-										button_container.UnselectButton(selected_button);
+
 										
 										break;
 									}
@@ -322,8 +322,6 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 										button_container.ButtonPressed(renderer, selected_button, BUTTON_TYPE::BUTTON_START);
 										current_draw_type = DRAW_TYPE::DRAW_START;
 
-										button_container.UnselectButton(selected_button);
-
 										break;
 									}
 
@@ -332,8 +330,6 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 										button_container.ButtonPressed(renderer, selected_button, BUTTON_TYPE::BUTTON_FINISH);
 										current_draw_type = DRAW_TYPE::DRAW_FINISH;
 
-										button_container.UnselectButton(selected_button);
-
 										break;
 									}
 
@@ -341,8 +337,6 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 
 										button_container.ButtonPressed(renderer, selected_button, BUTTON_TYPE::BUTTON_MAZE);
 										current_draw_type = DRAW_TYPE::DRAW_MAZE;
-
-										button_container.UnselectButton(selected_button);
 
 										break;
 									}
@@ -359,8 +353,6 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 										board.setStartPosition(-1, -1);
 										board.setFinishPosition(-1, -1);
 
-										button_container.UnselectButton(selected_button);
-
 										break;
 									}
 
@@ -372,8 +364,6 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 
 										SDL_RenderClear(renderer);
 
-										button_container.ClearButtons(renderer, selected_button);
-
 										// I should replace DRAW_TYPE with BUTTON_TYPE
 										current_draw_type = DRAW_TYPE::DRAW_MAZE;
 
@@ -383,8 +373,6 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 										// Instead of having booleans for these we could just check if the boards stored finish & start positions are -1, -1
 										finish_already_drawn = false;
 										start_already_drawn = false;
-
-										button_container.UnselectButton(selected_button);
 
 										break;
 									}
@@ -422,6 +410,8 @@ void MazeSolvingAlgorithmVisualizer::GameLoop() {
 								}
 							}
 						}
+
+						button_container.DrawButtons(renderer);
 
 					}
 

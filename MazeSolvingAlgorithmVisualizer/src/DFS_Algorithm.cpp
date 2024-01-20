@@ -68,9 +68,9 @@ bool DFS_Algorithm::Search(int row, int col) {
 
 			if (edge.getRow() == game_board->getFinishRowPosition() && edge.getCol() == game_board->getFinishColPosition()) {
 
-				DrawFinishedPath(edge.getRow(), edge.getCol());
-
 				found_finish = true;
+				
+				DrawFinishedPath(edge.getRow(), edge.getCol());
 
 				return true;
 			}

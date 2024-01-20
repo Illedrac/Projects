@@ -82,10 +82,11 @@ void ButtonContainer::DrawButtonForAMoment(SDL_Renderer* renderer, const BUTTON_
 
 void ButtonContainer::ButtonPressed(SDL_Renderer* renderer, BUTTON_TYPE& current_button_type, const BUTTON_TYPE& button_type_to_be_selected) {
 	
-	UnselectButton(current_button_type);
+	if (button_type_to_be_selected != BUTTON_TYPE::BUTTON_DFS || BUTTON_TYPE::BUTTON_BFS) {
+		UnselectButton(current_button_type);
+		current_button_type = button_type_to_be_selected;
+	}
 
-	current_button_type = button_type_to_be_selected;
-	
 	button_vector.at(GetButtonByButtonType(current_button_type)).setSelected(true);
 
 	DrawButtons(renderer);

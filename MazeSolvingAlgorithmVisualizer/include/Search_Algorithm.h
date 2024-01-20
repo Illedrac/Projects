@@ -20,6 +20,8 @@ public:
 	void ClearBoard();
 
 	virtual bool BeginSearch() = 0;
+	
+	inline bool FoundFinish() { return found_finish; }
 
 protected:
 
@@ -35,7 +37,7 @@ protected:
 	
 	inline std::deque<Edge> getQueue() { return queue; }
 	inline std::vector<Edge> getVisited() { return visited; }
-
+	
 	void DrawFinishedPath(const int& row, const int& col);
 	bool CheckSDLEvents();
 

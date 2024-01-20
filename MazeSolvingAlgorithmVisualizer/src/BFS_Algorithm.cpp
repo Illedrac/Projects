@@ -65,10 +65,10 @@ bool BFS_Algorithm::Search(int row, int col)
 				previous_map[current_pair_in_search] = std::make_pair(node.getRow(), node.getCol());
 
 			if (edge.getRow() == game_board->getFinishRowPosition() && edge.getCol() == game_board->getFinishColPosition()) {
-				
-				DrawFinishedPath(edge.getRow(), edge.getCol());
-				
+
 				found_finish = true;
+
+				DrawFinishedPath(edge.getRow(), edge.getCol());
 				
 				return true;
 			}
