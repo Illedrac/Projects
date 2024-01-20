@@ -3,7 +3,7 @@
 #include "SDL.h"
 
 enum BUTTON_TYPE {
-	
+	BUTTON_NONE,
 	BUTTON_SEARCH,
 	BUTTON_START,
 	BUTTON_FINISH,

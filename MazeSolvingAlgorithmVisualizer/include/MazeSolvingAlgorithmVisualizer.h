@@ -20,6 +20,19 @@ public:
 
 
 private:
+
+	void HandleButtonClick();
+	void HandleKeyboardButtonPress();
+
+	void SearchPressed();
+	void StartPressed();
+	void MazePressed();
+	void FinishPressed();
+	void AddWallsPressed();
+	void ResetPressed();
+	void DFSPressed();
+	void BFSPressed();
+
 	const int screen_width_px = 1910;
 	const int screen_height_px = 1040;
 	const int number_cells_width = 175;
@@ -29,6 +42,8 @@ private:
 
 	SDL_Renderer* renderer;
 	
+	SDL_Event event;
+
 	ButtonContainer button_container;
 
 	GameBoard board;
@@ -45,6 +60,12 @@ private:
 
 	bool continue_running_program = SDL_TRUE;
 	bool mouse_button_held = false;
-	bool finish_already_drawn = false;
+	bool finish_already_drawn = false; 
 	bool start_already_drawn = false;
+
+	BUTTON_TYPE selected_button;
+
+	int mouse_x;
+	int mouse_y;
+
 };
