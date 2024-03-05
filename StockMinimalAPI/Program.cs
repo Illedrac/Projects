@@ -39,6 +39,23 @@ public static class OwnedStockDB
 /// <param name="amountOfShares"> The amount of stock shares owned </param>
 public record Stock(string companyName, double buyPrice, double amountOfShares);
 
+
+public class BuyStockEvent
+{
+    public required string companyName { get; set; }
+    public required double buyPrice { get; set; }
+    public required double amountOfShares { get; set; }
+}
+#endregion
+
+#region Commands
+
+public class GetStockInformation : ICommand<string>
+{
+    public required string companyName { set; get; }
+    public required double buyPrice { set; get; }
+    public required double amountOfShares { set; get; }
+}
 #endregion
 
 #region Endpoints
@@ -188,6 +205,98 @@ public class DeleteStockByCompanyNameEndpoint : EndpointWithoutRequest<List<Stoc
         await SendAsync(OwnedStockDB.OwnedStockData);
 
 
+    }
+}
+
+public class BuyStockEndpoint : Endpoint<Stock>
+{
+    public override void Configure()
+    {
+        Post("/api/owned-stocks/buy");
+        AllowAnonymous();
+    }
+
+    public override async Task HandleAsync(Stock req, CancellationToken ct)
+    {
+        await PublishAsync(new BuyStockEvent
+        {
+            companyName = req.companyName,
+            amountOfShares = req.amountOfShares,
+            buyPrice = req.buyPrice
+        });
+
+        await SendOkAsync(cancellation: ct);
+    }
+}
+
+public class GetFullStockInformation : EndpointWithoutRequest<string>
+{
+        public override void Configure()
+        {
+            Get("/api/owned-stocks/full-info/{companyName}");
+            AllowAnonymous();
+        }
+
+        public override async Task HandleAsync(CancellationToken ct)
+        {
+            int stockIndex = -1;
+            var companyNameFromRoute = Route<string>("companyName");
+            
+        for (int i = 0; i < OwnedStockDB.OwnedStockData.Count(); i++)
+            {
+                if (String.Equals(OwnedStockDB.OwnedStockData[i].companyName, companyNameFromRoute))
+                {
+                    stockIndex = i;
+                    break;
+                }
+            }
+
+            if (stockIndex == -1)
+            {
+                await SendNotFoundAsync(cancellation: ct);
+                return;
+            }
+            var stockInformation = await new GetStockInformation()
+            {
+                companyName = OwnedStockDB.OwnedStockData[stockIndex].companyName,
+                buyPrice = OwnedStockDB.OwnedStockData[stockIndex].buyPrice,
+                amountOfShares = OwnedStockDB.OwnedStockData[stockIndex].amountOfShares
+
+            }.ExecuteAsync();
+            
+            await SendAsync(stockInformation);
+        }
+    }
+#endregion
+
+
+#region EventHandler
+
+public class StockBoughtHandler : IEventHandler<BuyStockEvent>
+{
+    private readonly ILogger _logger;
+
+    public StockBoughtHandler(ILogger<StockBoughtHandler> logger)
+    {
+        _logger = logger;
+    }
+
+    public Task HandleAsync(BuyStockEvent eventModel, CancellationToken ct)
+    {
+        // Not sure where to view this information
+        _logger.LogInformation($"Stock Bought Event Recieved: [{eventModel.companyName}]");
+        return Task.CompletedTask;
+    }
+}
+
+public class GetStockHandler : ICommandHandler<GetStockInformation, string>
+{
+    public Task<string> ExecuteAsync(GetStockInformation command, CancellationToken ct)
+    {
+        var result = "You own " + command.amountOfShares + " share(s) of "
+                     + command.companyName + " bought at $" + command.buyPrice;
+
+        return Task.FromResult(result);
     }
 }
 
