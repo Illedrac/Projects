@@ -67,7 +67,6 @@ public class CreateStockEndpoint : Endpoint<Stock, List<Stock>>
 {
     public override void Configure()
     {
-        // This POST functions to "Add a Stock to the OwnedStockDB List"
         Post("/api/owned-stocks");
         AllowAnonymous();
     }
@@ -89,7 +88,6 @@ public class GetStockEndpoint : EndpointWithoutRequest<List<Stock>>
 {
     public override void Configure()
     {
-        // This 
         Get("/api/owned-stocks");
         AllowAnonymous();
     }
