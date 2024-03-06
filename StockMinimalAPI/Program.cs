@@ -1,19 +1,30 @@
-using FastEndpoints;
+﻿using FastEndpoints;
 using FastEndpoints.Swagger;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson.Serialization;
+using MongoDB.Entities;
+﻿using Order = MongoDB.Entities.Order;
 
-var bld = WebApplication.CreateBuilder(args);
-bld.Services.AddFastEndpoints()
-            .SwaggerDocument();
+var bld = WebApplication.CreateBuilder();
+
+bld.Services
+   .AddSingleton(new DbContext("JobStoreDatabase", "localhost"))
+   .AddFastEndpoints()
+   .SwaggerDocument()
+   .AddJobQueues<JobRecord, JobProvider>();
 
 var app = bld.Build();
 
 app.UseFastEndpoints()
    .UseHttpsRedirection()
    .UseSwaggerGen();
+   //.UseJobQueues();
 
 app.Run();
 
 #region Models
+
+
 
 /// <summary>
 /// A "Database" class to hold "owned" Stocks
@@ -50,11 +61,17 @@ public class BuyStockEvent
 
 #region Commands
 
-public class GetStockInformation : ICommand<string>
+public class GetStockCommand : ICommand<string>
 {
     public required string companyName { set; get; }
     public required double buyPrice { set; get; }
     public required double amountOfShares { set; get; }
+}
+
+public class JobQueueCommand : ICommand
+{
+    public int Id { get; set; }
+    public string message { get; init; } = default!;
 }
 #endregion
 
@@ -254,7 +271,8 @@ public class GetFullStockInformation : EndpointWithoutRequest<string>
                 await SendNotFoundAsync(cancellation: ct);
                 return;
             }
-            var stockInformation = await new GetStockInformation()
+
+            var stockInformation = await new GetStockCommand()
             {
                 companyName = OwnedStockDB.OwnedStockData[stockIndex].companyName,
                 buyPrice = OwnedStockDB.OwnedStockData[stockIndex].buyPrice,
@@ -265,8 +283,29 @@ public class GetFullStockInformation : EndpointWithoutRequest<string>
             await SendAsync(stockInformation);
         }
     }
-#endregion
 
+
+sealed class SayHelloEndpoint : EndpointWithoutRequest
+{
+    public override void Configure()
+    {
+        Post("/api/job-queue-command");
+        AllowAnonymous();
+    }
+    public override async Task HandleAsync(CancellationToken c)
+    {
+        for (var i = 1; i <= 10; i++)
+        {
+            await new JobQueueCommand
+            {
+                Id = i,
+                message = "JobQueueCommand"
+            }.QueueJobAsync(ct: c);
+        }
+        await SendAsync("all jobs queued!", cancellation: c);
+    }
+}
+#endregion
 
 #region EventHandler
 
@@ -287,9 +326,9 @@ public class StockBoughtHandler : IEventHandler<BuyStockEvent>
     }
 }
 
-public class GetStockHandler : ICommandHandler<GetStockInformation, string>
+public class GetStockHandler : ICommandHandler<GetStockCommand, string>
 {
-    public Task<string> ExecuteAsync(GetStockInformation command, CancellationToken ct)
+    public Task<string> ExecuteAsync(GetStockCommand command, CancellationToken ct)
     {
         var result = "You own " + command.amountOfShares + " share(s) of "
                      + command.companyName + " bought at $" + command.buyPrice;
@@ -298,4 +337,71 @@ public class GetStockHandler : ICommandHandler<GetStockInformation, string>
     }
 }
 
+public class JobQueueCommandHandler(ILogger<JobQueueCommand> logger) : ICommandHandler<JobQueueCommand>
+{
+    public async Task ExecuteAsync(JobQueueCommand command, CancellationToken ct)
+    {
+        await Task.Delay(500, ct);
+
+        logger.LogInformation(" JobQueueCommand from id : {id} message {msg}", command.Id, command.message);
+
+    }
+}
+
+#endregion
+
+#region JobQueue
+
+public sealed class JobRecord : Entity, IJobStorageRecord
+{
+    public string QueueID { get; set; } = default!;
+    public object Command { get; set; } = default!;
+    public DateTime ExecuteAfter { get; set; }
+    public DateTime ExpireOn { get; set; }
+    public bool IsComplete { get; set; }
+}
+
+sealed class JobProvider(DbContext db, ILogger<JobProvider> logger) : IJobStorageProvider<JobRecord>
+{
+    public Task StoreJobAsync(JobRecord job, CancellationToken ct)
+        => db.SaveAsync(job, ct);
+
+    public async Task<IEnumerable<JobRecord>> GetNextBatchAsync(PendingJobSearchParams<JobRecord> p)
+        => await db.Find<JobRecord>()
+                   .Match(p.Match)
+                   .Sort(r => r.ID, Order.Ascending)
+                   .Limit(p.Limit)
+                   .ExecuteAsync(p.CancellationToken);
+
+    public Task MarkJobAsCompleteAsync(JobRecord job, CancellationToken ct)
+        => db.Update<JobRecord>()
+             .MatchID(job.ID)
+             .Modify(r => r.IsComplete, true)
+             .ExecuteAsync(ct);
+
+    public Task OnHandlerExecutionFailureAsync(JobRecord job, Exception exception, CancellationToken ct)
+    {
+        logger.LogInformation("Rescheduling failed job to be retried after 60 seconds...");
+
+        return db.Update<JobRecord>()
+                 .MatchID(job.ID)
+                 .Modify(r => r.ExecuteAfter, DateTime.UtcNow.AddMinutes(1))
+                 .ExecuteAsync(ct);
+    }
+
+    public Task PurgeStaleJobsAsync(StaleJobSearchParams<JobRecord> p)
+        => db.DeleteAsync(p.Match, p.CancellationToken);
+}
+
+sealed class DbContext : DBContext
+{
+    public DbContext(string database, string host) : base(database, host)
+    {
+        var objectSerializer = new MongoDB.Bson.Serialization.Serializers.ObjectSerializer(type =>
+            MongoDB.Bson.Serialization.Serializers.ObjectSerializer.DefaultAllowedTypes(type) ||
+            type.FullName!.EndsWith("Command"));
+
+        BsonSerializer.RegisterSerializer(objectSerializer);
+    }
+}
 #endregion
