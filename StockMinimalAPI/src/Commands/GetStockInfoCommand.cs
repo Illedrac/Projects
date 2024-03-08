@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-public class GetStockCommand : ICommand<string>
+public class GetStockInfoCommand : ICommand<string>
 {
     public required string companyName { set; get; }
     public required double buyPrice { set; get; }

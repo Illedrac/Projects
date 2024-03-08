@@ -1,5 +1,9 @@
 ﻿using FastEndpoints;
 
+/// <summary>
+/// FastEndpoints: This is a POST request endpoint
+/// Allows you to queue up (i) generic JobQueueCommands
+/// </summary>
 sealed class JobQueueEndpoint : EndpointWithoutRequest
 {
     public override void Configure()

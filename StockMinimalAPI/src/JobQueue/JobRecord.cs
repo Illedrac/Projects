@@ -1,5 +1,9 @@
 ﻿using FastEndpoints;
 
+
+/// <summary>
+/// FastEndpoints : This is a simple DTO for JobRecords
+/// </summary>
 public sealed class JobRecord : IJobStorageRecord
 {
     public string QueueID { get; set; } = default!;

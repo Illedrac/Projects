@@ -2,9 +2,8 @@
 
 /// <summary>
 /// FastEndpoints: This is a GET request endpoint
+/// Given the companyName in the url, this returns that Stock DTO matching on companyName (if it's in the DB)
 /// </summary>
-/// Again, notice how this is an EndpointWithoutRequest
-/// The endpoint (since it includes the companyName string in the url) will use that given company name to return the stock data
 public class GetStockByCompanyNameEndpoint : EndpointWithoutRequest<Stock>
 {
     public override void Configure()

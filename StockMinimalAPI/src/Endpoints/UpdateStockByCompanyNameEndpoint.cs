@@ -2,6 +2,7 @@
 
 /// <summary>
 /// FastEndpoints: This is a PUT request endpoint
+/// Given a Stock DTO request, this allows you to update a Stock DTO in the DB matching on companyName
 /// </summary>
 public class UpdateStockByCompanyNameEndpoint : Endpoint<Stock, Stock>
 {

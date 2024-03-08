@@ -2,6 +2,7 @@
 
 /// <summary>
 /// FastEndpoints: This is a DELETE request endpoint
+/// Given the companyName in the url, it will delete that Stock DTO from the DB
 /// </summary>
 public class DeleteStockByCompanyNameEndpoint : EndpointWithoutRequest<List<Stock>>
 {

@@ -1,6 +1,11 @@
 ﻿using FastEndpoints;
 using System.Runtime.ConstrainedExecution;
 
+/// <summary>
+/// FastEndpoints: This is a JobProvider
+/// It handles the JobQueueing and Storing of Jobs
+/// TODO: This doesn't really work
+/// </summary>
 sealed class JobProvider(ILogger<JobProvider> logger) : IJobStorageProvider<JobRecord>
 {
     List<JobRecord> jobs = [];
@@ -15,7 +20,7 @@ sealed class JobProvider(ILogger<JobProvider> logger) : IJobStorageProvider<JobR
         Console.WriteLine("GETNEXTBATCHASYNC");
         return jobs;
     }
-    // I know this is not async but it'll do for now
+    
     public async Task MarkJobAsCompleteAsync(JobRecord job, CancellationToken ct)
     {
         Console.WriteLine("MARKJOBASCOMPLETE");

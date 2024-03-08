@@ -1,5 +1,9 @@
 ﻿using FastEndpoints;
 
+/// <summary>
+/// This is an event handler for the StockBought event
+/// It simply logs to the logger that there was a StockBoughtEvent received with the company name of the Stock DTO
+/// </summary>
 public class StockBoughtHandler : IEventHandler<Stock>
 {
     private readonly ILogger _logger;

@@ -1,6 +1,10 @@
 ﻿using FastEndpoints;
 
-public class GetFullStockInformationEndPoint : EndpointWithoutRequest<string>
+/// <summary>
+/// FastEndpoints: This is a GET request endpoint
+/// Given a companyName in the URL, this creates a new GetStockCommand which will then be executed
+/// </summary>
+public class GetFullStockInfoEndPoint : EndpointWithoutRequest<string>
 {
     public override void Configure()
     {
@@ -28,7 +32,7 @@ public class GetFullStockInformationEndPoint : EndpointWithoutRequest<string>
             return;
         }
 
-        var stockInformation = await new GetStockCommand()
+        var stockInformation = await new GetStockInfoCommand()
         {
             companyName = OwnedStockDB.OwnedStockData[stockIndex].companyName,
             buyPrice = OwnedStockDB.OwnedStockData[stockIndex].buyPrice,
