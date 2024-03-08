@@ -19,11 +19,14 @@ sealed class JobProvider(ILogger<JobProvider> logger) : IJobStorageProvider<JobR
     public async Task MarkJobAsCompleteAsync(JobRecord job, CancellationToken ct)
     {
         Console.WriteLine("MARKJOBASCOMPLETE");
-        
-        for(int i = 0; i < jobs.Count(); i++)  
+
+        var index = 0;
+        while(index < jobs.Count())  
         {
-            if (jobs[i].QueueID == job.QueueID)
-                jobs.Remove(jobs[i]);
+            if (jobs[index].QueueID == job.QueueID)
+                jobs.Remove(jobs[index]);
+            else
+                index++;
         }
 
         await Task.CompletedTask; 
