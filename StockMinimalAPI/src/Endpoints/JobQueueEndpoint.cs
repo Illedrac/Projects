@@ -1,10 +1,10 @@
 ﻿using FastEndpoints;
 
-sealed class SayHelloEndpoint : EndpointWithoutRequest
+sealed class JobQueueEndpoint : EndpointWithoutRequest
 {
     public override void Configure()
     {
-        Post("/api/job-queue-command");
+        Post("/api/job-queue");
         AllowAnonymous();
     }
     public override async Task HandleAsync(CancellationToken c)

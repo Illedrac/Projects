@@ -4,16 +4,19 @@ using FastEndpoints.Swagger;
 var bld = WebApplication.CreateBuilder();
 
 bld.Services
-   .AddSingleton(new DbContext("JobStoreDatabase", "localhost"))
    .AddFastEndpoints()
    .SwaggerDocument()
-   .AddJobQueues<JobRecord, JobProvider>();
+   .AddJobQueues<JobRecord, JobProvider>()
+   .AddAWSLambdaHosting(LambdaEventSource.RestApi);
 
 var app = bld.Build();
 
 app.UseFastEndpoints()
    .UseHttpsRedirection()
    .UseSwaggerGen()
-   .UseJobQueues();
+   .UseJobQueues( o =>
+   {
+       o.ExecutionTimeLimit = TimeSpan.FromSeconds(10);
+   });
 
 app.Run();

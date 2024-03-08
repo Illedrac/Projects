@@ -4,7 +4,7 @@ public class JobQueueCommandHandler(ILogger<JobQueueCommand> logger) : ICommandH
 {
     public async Task ExecuteAsync(JobQueueCommand command, CancellationToken ct)
     {
-        await Task.Delay(5, ct);
+        await Task.Delay(1, ct);
 
         logger.LogInformation(" JobQueueCommand from id : {id} message {msg}", command.Id, command.message);
 

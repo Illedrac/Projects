@@ -1,34 +1,57 @@
 ﻿using FastEndpoints;
-using Order = MongoDB.Entities.Order;
+using System.Runtime.ConstrainedExecution;
 
-sealed class JobProvider(DbContext db, ILogger<JobProvider> logger) : IJobStorageProvider<JobRecord>
+sealed class JobProvider(ILogger<JobProvider> logger) : IJobStorageProvider<JobRecord>
 {
-    public Task StoreJobAsync(JobRecord job, CancellationToken ct)
-        => db.SaveAsync(job, ct);
+    List<JobRecord> jobs = [];
+    public async Task StoreJobAsync(JobRecord job, CancellationToken ct)
+    {
+        await Task.Run(() => { jobs.Add(job); }, ct);
 
+        Console.WriteLine("STOREJOBASYNC. Jobs.Count(): " + jobs.Count());
+    }
     public async Task<IEnumerable<JobRecord>> GetNextBatchAsync(PendingJobSearchParams<JobRecord> p)
-        => await db.Find<JobRecord>()
-                   .Match(p.Match)
-                   .Sort(r => r.ID, Order.Ascending)
-                   .Limit(p.Limit)
-                   .ExecuteAsync(p.CancellationToken);
+    {
+        Console.WriteLine("GETNEXTBATCHASYNC");
+        return jobs;
+    }
+    // I know this is not async but it'll do for now
+    public async Task MarkJobAsCompleteAsync(JobRecord job, CancellationToken ct)
+    {
+        Console.WriteLine("MARKJOBASCOMPLETE");
+        
+        for(int i = 0; i < jobs.Count(); i++)  
+        {
+            if (jobs[i].QueueID == job.QueueID)
+                jobs.Remove(jobs[i]);
+        }
 
-    public Task MarkJobAsCompleteAsync(JobRecord job, CancellationToken ct)
-        => db.Update<JobRecord>()
-             .MatchID(job.ID)
-             .Modify(r => r.IsComplete, true)
-             .ExecuteAsync(ct);
+        await Task.CompletedTask; 
+    
+    }
 
     public Task OnHandlerExecutionFailureAsync(JobRecord job, Exception exception, CancellationToken ct)
     {
+        Console.WriteLine("ONHANDLEREXECUTIONFAILURE");
+
         logger.LogInformation("Rescheduling failed job to be retried after 60 seconds...");
 
-        return db.Update<JobRecord>()
-                 .MatchID(job.ID)
-                 .Modify(r => r.ExecuteAfter, DateTime.UtcNow.AddMinutes(1))
-                 .ExecuteAsync(ct);
+        jobs.Find(match: q => q.QueueID == job.QueueID).ExecuteAfter = DateTime.Now.AddMinutes(1);
+
+        return Task.CompletedTask;
     }
 
     public Task PurgeStaleJobsAsync(StaleJobSearchParams<JobRecord> p)
-        => db.DeleteAsync(p.Match, p.CancellationToken);
+    {
+        Console.WriteLine("PURGESTALEJOBS");
+
+        foreach (JobRecord cur in jobs.FindAll(q => q.Equals(p)))
+        {
+            jobs.Remove(cur);
+
+        }
+
+        return Task.CompletedTask;
+    }
+    
 }

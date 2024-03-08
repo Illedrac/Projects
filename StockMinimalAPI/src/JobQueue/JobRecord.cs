@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
-using MongoDB.Entities;
 
-public sealed class JobRecord : Entity, IJobStorageRecord
+public sealed class JobRecord : IJobStorageRecord
 {
     public string QueueID { get; set; } = default!;
     public object Command { get; set; } = default!;
