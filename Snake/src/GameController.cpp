@@ -78,16 +78,16 @@ void GameController::GameLoop()
 						continue_running_program = false;
 				
 
-					if (event.key.keysym.scancode == SDL_SCANCODE_W)
+					if (event.key.keysym.scancode == SDL_SCANCODE_W || event.key.keysym.scancode == SDL_SCANCODE_UP)
 						snake_object.get()->addMoveToQueue(UP);
 					
-					else if (event.key.keysym.scancode == SDL_SCANCODE_A)
+					else if (event.key.keysym.scancode == SDL_SCANCODE_A || event.key.keysym.scancode == SDL_SCANCODE_LEFT)
 						snake_object.get()->addMoveToQueue(LEFT);
 				
-					else if (event.key.keysym.scancode == SDL_SCANCODE_S)
+					else if (event.key.keysym.scancode == SDL_SCANCODE_S || event.key.keysym.scancode == SDL_SCANCODE_DOWN)
 						snake_object.get()->addMoveToQueue(DOWN);
 				
-					else if (event.key.keysym.scancode == SDL_SCANCODE_D)
+					else if (event.key.keysym.scancode == SDL_SCANCODE_D || event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
 						snake_object.get()->addMoveToQueue(RIGHT);
 
 					break;
