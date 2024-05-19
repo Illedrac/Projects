@@ -11,7 +11,7 @@ GameController::~GameController()
 }
 
 GameController::GameController() :
-	game_board_object(std::make_shared<GameBoard>(screen_width_pixels / number_cells, screen_height_pixels / number_cells)),
+	game_board_object(std::make_shared<GameBoard>(screen_width_pixels, screen_height_pixels)),
 	snake_object(std::make_unique<Snake>()),
 	window(),
 	renderer()
@@ -25,13 +25,11 @@ GameController::GameController() :
 								&window,
 								&renderer);
 
-	SDL_SetWindowFullscreen(window, true);
+	//SDL_SetWindowFullscreen(window, true);
 
 
-	game_board_object.get()->DrawBoard(renderer);
-	SDL_RenderPresent(renderer);
+	game_board_object.get()->InitScreen(renderer);
 }
-
 
 void GameController::StartSnakeGame() 
 {
@@ -107,7 +105,6 @@ void GameController::GameLoop()
 							break;
 					
 						game_board_object.get()->DrawBoard(renderer);
-						SDL_RenderPresent(renderer);
 					}
 				}
 
@@ -120,7 +117,7 @@ void GameController::GameLoop()
 
 
 		
-		if (SDL_GetTicks() - last_update_made > 70)
+		if (SDL_GetTicks() - last_update_made > snake_update_delay_ms)
 		{
 			if (snake_object.get()->UpdateSnakeLocation(game_board_object, renderer))
 				game_board_object.get()->DrawBoard(renderer);

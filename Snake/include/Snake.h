@@ -23,9 +23,7 @@ public:
 
     void Reset(std::shared_ptr<GameBoard> game_board_ptr);
 
-    inline const std::vector<std::pair<int, int>>& getSnakeBody() { return snake_body_indexes; }
     inline void addMoveToQueue(DIRECTION next_dir) { move_queue.push(next_dir); }
-
 
     void InitSnake(std::shared_ptr<GameBoard> game_board_ptr);
 
@@ -44,4 +42,5 @@ private:
 
     std::queue<DIRECTION> move_queue;
     DIRECTION prev_direction;
+    bool hit_wall_once;
 };

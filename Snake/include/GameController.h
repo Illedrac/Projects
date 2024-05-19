@@ -7,6 +7,8 @@ class Snake;
 
 const int screen_width_pixels = 1920;
 const int screen_height_pixels = 1080;
+const int snake_update_delay_ms = 65;
+
 
 class GameController {
 
