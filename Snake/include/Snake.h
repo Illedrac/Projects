@@ -30,7 +30,7 @@ public:
     bool UpdateSnakeLocation(std::shared_ptr<GameBoard> game_board_ptr, 
                              SDL_Renderer* renderer);
     
-
+    inline int GetScore() { return score; }
 private:
 
     bool MoveSnakeGivenDirection(std::shared_ptr<GameBoard> game_board_ptr, 
@@ -43,4 +43,5 @@ private:
     std::queue<DIRECTION> move_queue;
     DIRECTION prev_direction;
     bool hit_wall_once;
+    int score;
 };

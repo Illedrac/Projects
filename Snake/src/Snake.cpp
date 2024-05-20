@@ -6,7 +6,8 @@ Snake::Snake() :
     snake_body_indexes(),
     move_queue(),
     prev_direction(NONE),
-    hit_wall_once(false)
+    hit_wall_once(false),
+    score(0)
 {
     snake_body_indexes.push_back(std::make_pair(default_snake_x, default_snake_y));
 }
@@ -23,6 +24,7 @@ void Snake::Reset(std::shared_ptr<GameBoard> game_board_ptr)
     snake_body_indexes.clear();
     snake_body_indexes.push_back(std::make_pair(default_snake_x, default_snake_y));
     game_board_ptr.get()->setCellType(default_snake_x, default_snake_y, SNAKE);
+    score = 0;
 }
 
 bool Snake::UpdateSnakeLocation(std::shared_ptr<GameBoard> game_board_ptr, SDL_Renderer* renderer)
@@ -150,7 +152,7 @@ bool Snake::MoveSnakeGivenDirection(std::shared_ptr<GameBoard> game_board_ptr, D
     //Such that the snake grows by one
     else 
     {
-        
+        score++;
         game_board_ptr.get()->setFoodExist(false);
         game_board_ptr.get()->setFood(-1, -1);
     }

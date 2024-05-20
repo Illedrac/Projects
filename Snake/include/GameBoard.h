@@ -23,7 +23,7 @@ public:
 			  const int screen_height_px);
 
 	
-	void InitScreen(SDL_Renderer* renderer);
+	void InitScreenToPlayGame(SDL_Renderer* renderer);
 	void DrawBoard(SDL_Renderer* renderer);
 	
 	
@@ -43,7 +43,8 @@ public:
 	inline bool IsOnFood(int x, int y) { return foodX == x && foodY == y;}
 	inline void setFood(int x, int y) { foodX = x; foodY = y; }
 
-
+	inline bool IsScreenInitialized() { return is_screen_initialized; }
+	inline void SetScreenInitialized(bool b) { is_screen_initialized = b; }
 private:
 
 	void ResetGameBoardVector();
@@ -54,6 +55,7 @@ private:
 	int cell_width_px;
 	int cell_height_px;
 	bool foodExists;
+	bool is_screen_initialized;
 
 	int foodX;
 	int foodY;

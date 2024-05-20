@@ -7,6 +7,7 @@ GameBoard::GameBoard(const int screen_width_px,
 	cell_width_px(screen_height_px / number_cells),
 	cell_height_px(screen_height_px / number_cells),
 	foodExists(false),
+	is_screen_initialized(false),
 	foodX(-1),
 	foodY(-1),
 	x_cell_offset( (screen_width_px / 2) - (cell_height_px * (number_cells / 2))),
@@ -15,28 +16,25 @@ GameBoard::GameBoard(const int screen_width_px,
 {
 }
 
-void GameBoard::InitScreen(SDL_Renderer* renderer)
+void GameBoard::InitScreenToPlayGame(SDL_Renderer* renderer)
 {
 	
-	//Fill in a white screen
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	//Fill in a black screen
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 
-	//SDL rect for the left and right black rectangles
-	SDL_Rect left_right_black_rectangles;
 
-	left_right_black_rectangles.x = 0;
-	left_right_black_rectangles.y = 0;
-	left_right_black_rectangles.w = x_cell_offset;
-	left_right_black_rectangles.h = screen_height_px;
+	SDL_Rect center_white_rectangle;
+	center_white_rectangle.x = x_cell_offset;
+	center_white_rectangle.y = 0;
+	center_white_rectangle.w = screen_width_px - 2 * x_cell_offset + cell_width_px + line_between_cells_offset_px;
+	center_white_rectangle.h = screen_height_px - 4;
 
-	//Draw the left rectangle
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderFillRect(renderer, &left_right_black_rectangles);
+	//Draw the center white rectangle
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderFillRect(renderer, &center_white_rectangle);
 
-	//Update the X position and draw the right black rectangle
-	left_right_black_rectangles.x = screen_width_px - x_cell_offset + cell_width_px + line_between_cells_offset_px;
-	SDL_RenderFillRect(renderer, &left_right_black_rectangles);
+	is_screen_initialized = true;
 
 }
 
