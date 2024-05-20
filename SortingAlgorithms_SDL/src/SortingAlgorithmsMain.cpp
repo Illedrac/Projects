@@ -132,7 +132,7 @@ int WinMain() {
         // Loop to drive event handling
         while (SDL_PollEvent(&event)) {
             
-            // If we shoudl display the main menu
+            // If we should display the main menu
             if (main_menu){
 
                 // Display the text boxes, we can use the initial array value since we don't have to redraw the menu options
