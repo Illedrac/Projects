@@ -1,9 +1,10 @@
 #include "GameController.h"
-
+#include "GameBoard.h"
 
 GameController::GameController() :
     renderer(),
-    window()
+    window(),
+    game_board_pointer(std::make_unique<GameBoard>(screen_width, screen_height))
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -23,7 +24,6 @@ void GameController::StartGame()
     GameLoop();
 
 }
-
 
 void GameController::GameLoop()
 {
@@ -49,6 +49,8 @@ void GameController::GameLoop()
             }
 
         }
+
+        game_board_pointer.get()->DrawGameBoard(renderer);
 
     }
 }
