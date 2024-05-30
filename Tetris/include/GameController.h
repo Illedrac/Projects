@@ -9,6 +9,7 @@ const int FPS = 60;
 const int frame_delay = 1e3 / FPS;
 
 class GameBoard;
+class Block;
 
 class GameController 
 {
@@ -27,5 +28,9 @@ private:
     SDL_Window* window;
 
     std::unique_ptr<GameBoard> game_board_pointer;
-    
+    std::unique_ptr<Block> current_block_being_placed;
+
+    bool should_spawn_another_block;
+
+
 };

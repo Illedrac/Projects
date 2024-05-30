@@ -22,12 +22,12 @@ void GameBoard::InitializeGameBoardVector()
     for (int row = 0; row < number_cells_height; row++)
     {
         
-        std::vector<CELL_TYPE> temp;
+        std::vector<BLOCK_TYPE> temp;
         
         for (int col = 0; col < number_cells_width; col++)
         {
         
-            temp.push_back(CELL_TYPE::NONE);
+            temp.push_back(BLOCK_TYPE::NONE);
         }
 
         game_board_vector.push_back(temp);
@@ -64,6 +64,14 @@ void GameBoard::DrawGameBoardAtIndice(SDL_Renderer* renderer,
             color.r = 255;
             color.g = 255;
             color.b = 255;
+            break;
+        }
+        case O:
+        {
+            color.r = 255;
+            color.g = 255;
+            color.b = 0;
+            break;
         }
         default:
         {
@@ -81,5 +89,15 @@ void GameBoard::DrawGameBoardAtIndice(SDL_Renderer* renderer,
     current_block_rec.h = cell_width_px - line_between_cells_offset;
 
     SDL_RenderFillRect(renderer, &current_block_rec);
+
+}
+
+void GameBoard::UpdateCurrentBlockPosition(const BLOCK_TYPE& type, const std::vector<std::pair<int, int>>& position_vector)
+{
+
+    for (const std::pair<int, int>& current_subblock_pair : position_vector)
+    {
+        setCellTypeAtIndex(current_subblock_pair.first, current_subblock_pair.second, type);
+    }
 
 }
