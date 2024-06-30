@@ -73,6 +73,48 @@ void GameBoard::DrawGameBoardAtIndice(SDL_Renderer* renderer,
             color.b = 0;
             break;
         }
+        case I:
+        {
+            color.r = 57;
+            color.g = 199;
+            color.b = 204;
+            break;
+        }
+        case J:
+        {
+            color.r = 215;
+            color.g = 91;
+            color.b = 222;
+            break;
+        }
+        case L:
+        {
+            color.r = 214;
+            color.g = 133;
+            color.b = 26;
+            break;
+        }
+        case S:
+        {
+            color.r = 186;
+            color.g = 30;
+            color.b = 13;
+            break;
+        }
+        case Z:
+        {
+            color.r = 77;
+            color.g = 219;
+            color.b = 82;
+            break;
+        }
+        case T:
+        {
+            color.r = 142;
+            color.g = 0;
+            color.b = 161;
+            break;
+        }
         default:
         {
             break;
@@ -92,12 +134,193 @@ void GameBoard::DrawGameBoardAtIndice(SDL_Renderer* renderer,
 
 }
 
-void GameBoard::UpdateCurrentBlockPosition(const BLOCK_TYPE& type, const std::vector<std::pair<int, int>>& position_vector)
+void GameBoard::UpdateCurrentBlockPosition(const BLOCK_TYPE& type, 
+                                           const std::vector<std::pair<int, int>>& position_vector,
+                                           const std::vector<std::pair<int, int>>& previous_position_vector)
+{
+
+    for (const std::pair<int, int>& current_subblock_pair : previous_position_vector)
+    {
+        if (current_subblock_pair.first < number_cells_height)
+            setCellTypeAtIndex(current_subblock_pair.first, current_subblock_pair.second, BLOCK_TYPE::NONE);
+
+    }
+
+    for (const std::pair<int, int>& current_subblock_pair : position_vector)
+    {
+        if(current_subblock_pair.first < number_cells_height)
+            setCellTypeAtIndex(current_subblock_pair.first, current_subblock_pair.second, type);
+    
+    }
+
+}
+
+void GameBoard::CheckIfClearRow()
+{
+
+    for (int row = number_cells_height - 1; row >= 0; row--)
+    {
+        bool clearRow = true;
+        bool foundBlock = false;
+
+        for (int col = number_cells_width - 1; col >= 0; col--)
+        {
+            BLOCK_TYPE current_type = getCellTypeAtIndex(row, col);
+            if (clearRow && current_type == BLOCK_TYPE::NONE)
+                clearRow = false;
+            else if (!foundBlock && current_type != BLOCK_TYPE::NONE)
+                foundBlock = true;
+        }
+        if (!foundBlock)
+            return;
+
+        if(clearRow)
+            ClearCurrentRow(row);
+    }
+}
+
+void GameBoard::ClearCurrentRow(const int& in_row)
+{
+    for (int row = in_row; row >= 1; row--)
+    {
+
+        for (int col = number_cells_width - 1; col >= 0; col--)
+        {
+            setCellTypeAtIndex(row, col, getCellTypeAtIndex(row - 1, col));
+        }
+    }
+}
+
+bool GameBoard::CanBlockMoveDown(const std::vector<std::pair<int, int>>& position_vector)
 {
 
     for (const std::pair<int, int>& current_subblock_pair : position_vector)
     {
-        setCellTypeAtIndex(current_subblock_pair.first, current_subblock_pair.second, type);
+        std::pair<int, int> block_below = std::make_pair<int, int>(current_subblock_pair.first + 1, current_subblock_pair.second + 0);
+        
+        if(std::find(position_vector.begin(), position_vector.end(), block_below) == std::end(position_vector))
+        {
+                                  
+            if (!IsBlockInBounds(block_below))
+                return false;
+        
+            if (getCellTypeAtIndex(block_below.first, block_below.second) != NONE)
+                return false;
+        }
     }
 
+    return true;
+
+}
+
+bool GameBoard::CanBlockMoveLeft(const std::vector<std::pair<int, int>>& position_vector)
+{
+
+    for (const std::pair<int, int>& current_subblock_pair : position_vector)
+    {
+        std::pair<int, int> block_to_the_left = std::make_pair<int, int>(current_subblock_pair.first + 0, current_subblock_pair.second - 1);
+
+        if (std::find(position_vector.begin(), position_vector.end(), block_to_the_left) == std::end(position_vector))
+        {
+
+            if (!IsBlockInBounds(block_to_the_left))
+                return false;
+
+            if (getCellTypeAtIndex(block_to_the_left.first, block_to_the_left.second) != NONE)
+                return false;
+        }
+    }
+
+    return true;
+
+}
+
+bool GameBoard::CanBlockMoveRight(const std::vector<std::pair<int, int>>& position_vector)
+{
+
+    for (const std::pair<int, int>& current_subblock_pair : position_vector)
+    {
+        std::pair<int, int> block_to_the_right = std::make_pair<int, int>(current_subblock_pair.first + 0, current_subblock_pair.second + 1);
+
+        if (std::find(position_vector.begin(), position_vector.end(), block_to_the_right) == std::end(position_vector))
+        {
+
+            if (!IsBlockInBounds(block_to_the_right))
+                return false;
+
+            if (getCellTypeAtIndex(block_to_the_right.first, block_to_the_right.second) != NONE)
+                return false;
+        }
+    }
+
+    return true;
+
+}
+
+bool GameBoard::CanBlockRotateRight(const std::vector<std::pair<int, int>>& position_vector)
+{
+
+
+    for (const std::pair<int, int>& current_subblock_pair : position_vector)
+    {
+
+        int x = current_subblock_pair.first;
+        int y = current_subblock_pair.second;
+
+        int temp_new_x = position_vector.at(1).first + (y - position_vector.at(1).second);
+        int temp_new_y = position_vector.at(1).second - (x - position_vector.at(1).first);
+        
+        std::pair<int, int> temp_rotated_block(temp_new_x, temp_new_y);
+
+        if (std::find(position_vector.begin(), position_vector.end(), temp_rotated_block) == std::end(position_vector))
+        {
+
+            if (!IsBlockInBounds(temp_rotated_block))
+                return false;
+
+            if (getCellTypeAtIndex(temp_rotated_block.first, temp_rotated_block.second) != NONE)
+                return false;
+        }
+    }
+
+    return true;
+
+}
+
+bool GameBoard::CanBlockRotateLeft(const std::vector<std::pair<int, int>>& position_vector)
+{
+
+
+    for (const std::pair<int, int>& current_subblock_pair : position_vector)
+    {
+
+        int x = current_subblock_pair.first;
+        int y = current_subblock_pair.second;
+
+        int temp_new_x = position_vector.at(1).first - (y - position_vector.at(1).second);
+        int temp_new_y = position_vector.at(1).second + (x - position_vector.at(1).first);
+
+        std::pair<int, int> temp_rotated_block(temp_new_x, temp_new_y);
+
+        if (std::find(position_vector.begin(), position_vector.end(), temp_rotated_block) == std::end(position_vector))
+        {
+
+            if (!IsBlockInBounds(temp_rotated_block))
+                return false;
+
+            if (getCellTypeAtIndex(temp_rotated_block.first, temp_rotated_block.second) != NONE)
+                return false;
+        }
+    }
+
+    return true;
+
+}
+
+bool GameBoard::IsBlockInBounds(const std::pair<int, int>& block)
+{
+    return (block.first >= 0 && 
+            block.first < number_cells_height && 
+            block.second >= 0 && 
+            block.second < number_cells_width) ? true : false;
 }

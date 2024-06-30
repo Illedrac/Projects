@@ -1,3 +1,4 @@
+#include <random>
 #include "Block_Factory.h"
 #include "L_Block.h"
 #include "J_Block.h"
@@ -7,8 +8,16 @@
 #include "T_Block.h"
 #include "I_Block.h"
 
-Block* Block_Factory::getBlock(BLOCK_TYPE type)
+Block* Block_Factory::getBlock()
 {
+
+    std::random_device r;
+
+    std::default_random_engine e1(r());
+
+    std::uniform_int_distribution<int> uniform_dist(2, 8);
+
+    BLOCK_TYPE type = static_cast<BLOCK_TYPE>(uniform_dist(e1));
 
     switch (type)
     {

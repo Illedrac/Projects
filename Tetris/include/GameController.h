@@ -6,7 +6,9 @@ const int screen_width = 1920;
 const int screen_height = 1080;
 
 const int FPS = 60;
-const int frame_delay = 1e3 / FPS;
+const double frame_delay = 1e3 / FPS;
+const double update_delay_normal = frame_delay * 25.0;
+const double update_delay_fast = frame_delay * 3.0;
 
 class GameBoard;
 class Block;
