@@ -6,7 +6,6 @@
 enum BLOCK_TYPE
 {
     NONE,
-    WALL,
     L,
     J,
     O,

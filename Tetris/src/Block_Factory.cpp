@@ -13,9 +13,9 @@ Block* Block_Factory::getBlock()
 
     std::random_device r;
 
-    std::default_random_engine e1(r());
+    std::mt19937 e1(r());
 
-    std::uniform_int_distribution<int> uniform_dist(2, 8);
+    std::uniform_int_distribution<int> uniform_dist(1, 7);
 
     BLOCK_TYPE type = static_cast<BLOCK_TYPE>(uniform_dist(e1));
 
