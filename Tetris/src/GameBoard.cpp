@@ -16,9 +16,15 @@ GameBoard::~GameBoard()
 {
 }
 
+void GameBoard::ResetGameBoard()
+{
+    InitializeGameBoardVector();
+}
 
 void GameBoard::InitializeGameBoardVector()
 {
+    game_board_vector.clear();
+
     for (int row = 0; row < number_cells_height; row++)
     {
         
@@ -161,32 +167,38 @@ void GameBoard::CheckIfClearRow()
     for (int row = number_cells_height - 1; row >= 0; row--)
     {
         bool clearRow = true;
-        bool foundBlock = false;
 
         for (int col = number_cells_width - 1; col >= 0; col--)
         {
-            BLOCK_TYPE current_type = getCellTypeAtIndex(row, col);
-            if (clearRow && current_type == BLOCK_TYPE::NONE)
+            if (game_board_vector.at(row).at(col) == BLOCK_TYPE::NONE)
                 clearRow = false;
-            else if (!foundBlock && current_type != BLOCK_TYPE::NONE)
-                foundBlock = true;
         }
-        if (!foundBlock)
-            return;
 
-        if(clearRow)
+        if (clearRow)
+        {
             ClearCurrentRow(row);
+            ++row;
+        }
     }
 }
 
 void GameBoard::ClearCurrentRow(const int& in_row)
 {
-    for (int row = in_row; row >= 1; row--)
+    for (int row = in_row; row >= 0; row--)
     {
 
         for (int col = number_cells_width - 1; col >= 0; col--)
         {
-            setCellTypeAtIndex(row, col, getCellTypeAtIndex(row - 1, col));
+
+            if (row > 0)
+            {
+                setCellTypeAtIndex(row, col, getCellTypeAtIndex(row - 1, col));
+            }
+            else
+            {
+                setCellTypeAtIndex(row, col, BLOCK_TYPE::NONE);
+
+            }
         }
     }
 }

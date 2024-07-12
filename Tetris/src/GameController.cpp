@@ -6,7 +6,8 @@ GameController::GameController() :
     renderer(),
     window(),
     game_board_pointer(std::make_unique<GameBoard>(screen_width, screen_height)),
-    current_block_being_placed(),
+    current_block_being_placed(std::unique_ptr<Block>(Block_Factory::getBlock())),
+    next_block_to_be_placed(std::unique_ptr<Block>(Block_Factory::getBlock())),
     should_spawn_another_block(true)
 
 {
@@ -68,7 +69,14 @@ void GameController::GameLoop()
                         continue_running_program = false;
                         break;
                     }
-                
+                    
+                    if (sdl_event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
+                    {
+                        game_board_pointer.get()->ResetGameBoard();
+                        current_block_being_placed = std::unique_ptr<Block>(Block_Factory::getBlock());
+                        break;
+                    }
+                    
                     if (sdl_event.key.keysym.scancode == SDL_SCANCODE_D)
                     {
                         if (game_board_pointer.get()->CanBlockMoveRight(current_block_being_placed.get()->GetBlockPositionVector()))
@@ -113,13 +121,6 @@ void GameController::GameLoop()
             }
         }
 
-        if (should_spawn_another_block)
-        {
-            current_block_being_placed = std::unique_ptr<Block>(Block_Factory::getBlock());
-            should_spawn_another_block = false;
-            
-        }
-
         if (SDL_GetTicks() - last_game_update > update_delay)
         {
             if (game_board_pointer.get()->CanBlockMoveDown(current_block_being_placed.get()->GetBlockPositionVector()))
@@ -128,8 +129,10 @@ void GameController::GameLoop()
             }
             else
             {
+                current_block_being_placed = std::move(next_block_to_be_placed);
+                current_block_being_placed = std::unique_ptr<Block>(Block_Factory::getBlock());
+
                 game_board_pointer.get()->CheckIfClearRow();
-                should_spawn_another_block = true;
             }       
 
             last_game_update = SDL_GetTicks();

@@ -40,6 +40,8 @@ public:
 
     void CheckIfClearRow();
 
+    void ResetGameBoard();
+
 private:
 
     void InitializeGameBoardVector();

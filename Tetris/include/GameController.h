@@ -31,6 +31,7 @@ private:
 
     std::unique_ptr<GameBoard> game_board_pointer;
     std::unique_ptr<Block> current_block_being_placed;
+    std::unique_ptr<Block> next_block_to_be_placed;
 
     bool should_spawn_another_block;
 
