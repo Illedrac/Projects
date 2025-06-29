@@ -42,6 +42,8 @@ void GameController::GameLoop()
 
     double update_delay = update_delay_normal;
 
+    game_board_pointer.get()->DrawNextBlock(renderer, next_block_to_be_placed.get()->GetBlockType());
+
     while (continue_running_program)
     {
         frame_start = SDL_GetTicks();
@@ -130,9 +132,11 @@ void GameController::GameLoop()
             else
             {
                 current_block_being_placed = std::move(next_block_to_be_placed);
-                current_block_being_placed = std::unique_ptr<Block>(Block_Factory::getBlock());
+                next_block_to_be_placed = std::unique_ptr<Block>(Block_Factory::getBlock());
 
                 game_board_pointer.get()->CheckIfClearRow();
+
+                game_board_pointer.get()->DrawNextBlock(renderer, next_block_to_be_placed.get()->GetBlockType());
             }       
 
             last_game_update = SDL_GetTicks();

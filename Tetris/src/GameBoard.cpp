@@ -49,7 +49,7 @@ void GameBoard::DrawGameBoard(SDL_Renderer* renderer)
         for (int col = 0; col < game_board_vector.at(row).size(); col++)
         {
 
-            DrawGameBoardAtIndice(renderer, row, col);
+            DrawGameBoardAtIndice(renderer, row, col, getCellTypeAtIndex(row, col));
 
         }
     }
@@ -59,11 +59,12 @@ void GameBoard::DrawGameBoard(SDL_Renderer* renderer)
 
 void GameBoard::DrawGameBoardAtIndice(SDL_Renderer* renderer, 
                                       const int& row, 
-                                      const int& col)
+                                      const int& col,
+                                      BLOCK_TYPE type)
 {                    // R  G  B  A
     SDL_Color color = { 0, 0, 0, 255 };
 
-    switch (getCellTypeAtIndex(row, col))
+    switch (type)
     {
         case NONE:
         {
@@ -137,6 +138,97 @@ void GameBoard::DrawGameBoardAtIndice(SDL_Renderer* renderer,
     current_block_rec.h = cell_width_px - line_between_cells_offset;
 
     SDL_RenderFillRect(renderer, &current_block_rec);
+
+}
+
+void GameBoard::DrawNextBlock(SDL_Renderer* renderer, BLOCK_TYPE next_block_type)
+{
+
+    std::vector<std::pair<int,int>> indices;
+
+    switch (next_block_type)
+    {
+        case O:
+        {
+            indices.push_back(std::make_pair(1, 1));
+            indices.push_back(std::make_pair(1, 2));
+            indices.push_back(std::make_pair(2, 1));
+            indices.push_back(std::make_pair(2, 2));
+            break;
+        }
+        case I:
+        {
+            indices.push_back(std::make_pair(0, 2));
+            indices.push_back(std::make_pair(1, 2));
+            indices.push_back(std::make_pair(2, 2));
+            indices.push_back(std::make_pair(3, 2));
+
+            break;
+        }
+        case J:
+        {
+            indices.push_back(std::make_pair(1, 2));
+            indices.push_back(std::make_pair(2, 2));
+            indices.push_back(std::make_pair(3, 2));
+            indices.push_back(std::make_pair(3, 1));
+
+            break;
+        }
+        case L:
+        {
+            indices.push_back(std::make_pair(1, 1));
+            indices.push_back(std::make_pair(2, 1));
+            indices.push_back(std::make_pair(3, 1));
+            indices.push_back(std::make_pair(3, 2));
+            break;
+        }
+        case S:
+        {
+            indices.push_back(std::make_pair(2, 3));
+            indices.push_back(std::make_pair(2, 2));
+            indices.push_back(std::make_pair(3, 2));
+            indices.push_back(std::make_pair(3, 1));
+            break;
+        }
+        case Z:
+        {
+            indices.push_back(std::make_pair(2, 0));
+            indices.push_back(std::make_pair(2, 1));
+            indices.push_back(std::make_pair(3, 1));
+            indices.push_back(std::make_pair(3, 2));
+            break;
+        }
+        case T:
+        {
+            indices.push_back(std::make_pair(2, 3));
+            indices.push_back(std::make_pair(2, 1));
+            indices.push_back(std::make_pair(2, 2));
+            indices.push_back(std::make_pair(3, 2));
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+
+
+
+    SDL_Rect current_block_rec;
+
+    for (int row = 0; row < 4; row++)
+    {
+        for (int col = 0; col < 4; col++)
+        {
+            if(std::find(indices.begin(), indices.end(), std::make_pair(row,col)) != indices.end())
+                DrawGameBoardAtIndice(renderer, row + 1, col + 14, next_block_type);
+            else
+                DrawGameBoardAtIndice(renderer, row + 1, col + 14, NONE);
+
+        }
+    }
+
+    SDL_RenderPresent(renderer);
 
 }
 

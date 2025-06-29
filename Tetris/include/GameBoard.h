@@ -21,8 +21,11 @@ public:
 
     void DrawGameBoardAtIndice(SDL_Renderer* renderer, 
                                const int& row, 
-                               const int& col);
-    
+                               const int& col,
+                               BLOCK_TYPE type);
+
+    void DrawNextBlock(SDL_Renderer* renderer, BLOCK_TYPE next_block_type);
+
     inline BLOCK_TYPE getCellTypeAtIndex(const int& row, const int& col) { return game_board_vector.at(row).at(col); }
 
     inline void setCellTypeAtIndex(const int& row, const int& col, BLOCK_TYPE type) { game_board_vector.at(row).at(col) = type; }
